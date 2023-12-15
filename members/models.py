@@ -82,9 +82,9 @@ the most efficient and maintainable solution.
 """
 
 
-class AccountStatus(Enum):
-    ACTIVE = "active"
-    INACTIVE = "inactive"
+# class AccountStatus(Enum):
+#     ACTIVE = "active"
+#     INACTIVE = "inactive"
 
 
 class Gender(Enum):
@@ -105,20 +105,20 @@ class Member(models.Model):
     last_name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=255)
-    status = models.CharField(max_length=55, choices=AccountStatus.choices)
+    # status = models.CharField(max_length=55, choices=AccountStatus.choices)
     dateOfMembership = models.DateTimeField(auto_now_add=True)
 
 
 class Reader(Member):
     Reader_id = models.BigAutoField(primary_key=True)
     birth_date = models.DateField()
-    gender = models.CharField(max_length=55, choices=Gender.choices)
+    # gender = models.CharField(max_length=55, choices=Gender.choices)
 
 
 class Author(Member):
     author_id = models.BigAutoField(primary_key=True)
     birth_date = models.DateField()
-    gender = models.CharField(max_length=55, choices=Gender.choices)
+    # gender = models.CharField(max_length=55, choices=Gender.choices)
 
 
 class PublishingHouse(Member):
