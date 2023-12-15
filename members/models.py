@@ -17,7 +17,9 @@ Python
 class Member(models.Model):
     reader_ptr = models.OneToOneField(Reader, on_delete=models.CASCADE, null=True, blank=True)
     author_ptr = models.OneToOneField(Author, on_delete=models.CASCADE, null=True, blank=True)
-    publishing_house_ptr = models.OneToOneField(PublishingHouse, on_delete=models.CASCADE, null=True, blank=True)
+    publishing_house_ptr = models.OneToOneField(
+        PublishingHouse, on_delete=models.CASCADE, null=True, blank=True
+        )
 
     def get_type(self):
         if self.reader_ptr:
