@@ -1,5 +1,5 @@
 from django.db import models
-from enum import Enum
+
 
 """
 Unfortunately, directly inheriting from all the previous classes 
@@ -82,12 +82,12 @@ the most efficient and maintainable solution.
 """
 
 
-# class AccountStatus(Enum):
+# class AccountStatus():
 #     ACTIVE = "active"
 #     INACTIVE = "inactive"
 
 
-class Gender(Enum):
+class Gender():
     MALE = "male"
     FEMALE = "female"
 
@@ -99,7 +99,25 @@ class Address(models.Model):
     country = models.CharField(max_length=255)
 
 
-class Member(models.Model):
+class Reader(models.Model):
+    Reader_id = models.BigAutoField(primary_key=True)
+    # birth_date = models.DateField()
+    # gender = models.CharField(max_length=55, choices=Gender.choices)
+
+
+class Author(models.Model):
+    author_id = models.BigAutoField(primary_key=True)
+    # birth_date = models.DateField()
+    # gender = models.CharField(max_length=55, choices=Gender.choices)
+
+
+class PublishingHouse(models.Model):
+    publishing_house_id = models.BigAutoField(primary_key=True)
+    address = models.OneToOneField(Address, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=20)
+
+
+class Member(Reader, Author, PublishingHouse):
     Member_id = models.BigAutoField(primary_key=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
@@ -107,21 +125,11 @@ class Member(models.Model):
     password = models.CharField(max_length=255)
     # status = models.CharField(max_length=55, choices=AccountStatus.choices)
     dateOfMembership = models.DateTimeField(auto_now_add=True)
-
-
-class Reader(Member):
-    Reader_id = models.BigAutoField(primary_key=True)
-    birth_date = models.DateField()
-    # gender = models.CharField(max_length=55, choices=Gender.choices)
-
-
-class Author(Member):
-    author_id = models.BigAutoField(primary_key=True)
-    birth_date = models.DateField()
-    # gender = models.CharField(max_length=55, choices=Gender.choices)
-
-
-class PublishingHouse(Member):
-    publishing_house_id = models.BigAutoField(primary_key=True)
-    address = models.OneToOneField(Address, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=20)
+    identity = models.CharField(
+        max_length=255,
+        choices=(
+            ("reader", "Reader"),
+            ("author", "Author"),
+            ("publishingHouse", "PublishingHouse"),
+        ),
+    )
