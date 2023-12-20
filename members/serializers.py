@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Gender, Address, Member, Reader, Author, PublishingHouse
 
 
+
 class GenderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Gender
