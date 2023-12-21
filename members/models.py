@@ -42,7 +42,7 @@ class Member(Reader, Author, PublishingHouse):
     last_name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=255)
-    status = models.CharField(max_length=55 ,choices=AccountStatus)
+    status = models.CharField(max_length=55, choices=AccountStatus)
     dateOfMembership = models.DateTimeField(auto_now_add=True)
     identity = models.CharField(
         choices=(
@@ -50,7 +50,5 @@ class Member(Reader, Author, PublishingHouse):
             ("author", "Author"),
             ("publishingHouse", "PublishingHouse"),
         ),
-        
-max_length=255,
+        max_length=255,
     )
-

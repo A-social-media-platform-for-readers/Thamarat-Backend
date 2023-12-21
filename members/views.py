@@ -8,13 +8,13 @@ from .models import Member
 from .serializers import *
 
 
-@api_view(['GET', 'POST'])
+@api_view(["GET", "POST"])
 def Member_list(request):
     if request.method == "GET":
         Members = Member.objects.all()
         serializer = MemberSerializer(Members, many=True)
         return Response(serializer.data)
-    
+
     elif request.method == "POST":
         # data = JSONParser().parse(request)
         serializer = MemberSerializer(data=request.data)
@@ -24,7 +24,7 @@ def Member_list(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET', 'PUT', 'DELETE'])
+@api_view(["GET", "PUT", "DELETE"])
 def Member_detail(request, pk):
     try:
         member = Member.objects.get(pk=pk)
@@ -34,15 +34,15 @@ def Member_detail(request, pk):
     if request.method == "GET":
         serializer = MemberSerializer(Member)
         return Response(serializer.data)
-    
+
     elif request.method == "PUT":
         data = JSONParser().parse(request)
         serializer = MemberSerializer(Member, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors,  status=status.HTTP_400_BAD_REQUEST)
-    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     elif request.method == "DELETE":
         Member.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
