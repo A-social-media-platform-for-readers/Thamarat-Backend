@@ -1,5 +1,10 @@
 from rest_framework import serializers
-from .models import Gender, Address, Member, Reader, Author, PublishingHouse
+from .models import Gender, Address, Member, Reader, Author, PublishingHouse, AccountStatus
+
+class AccountStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AccountStatus
+        fields = "__all__"
 
 
 class GenderSerializer(serializers.ModelSerializer):
@@ -36,3 +41,4 @@ class PublishingHouseSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = PublishingHouse
 		fields = "__all__"
+

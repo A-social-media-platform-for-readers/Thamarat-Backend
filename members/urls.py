@@ -1,7 +1,7 @@
 from django.urls import path
-
-
+from . import views
 
 urlpatterns = [
-    # path('', , name=''),
+    path('members/', views.Member_list),
+    path('members/<int:pk>/', views.Member_detail),
 ]

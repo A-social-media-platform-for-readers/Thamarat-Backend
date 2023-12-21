@@ -1,36 +1,45 @@
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.parsers import JSONParser
 from .models import Member
 from .serializers import MemberSerializer
 
 
+@csrf_exempt
 def Member_list(request):
     if request.method == "GET":
         Members = Member.objects.all()
         serializer = MemberSerializer(Members, many=True)
         return JsonResponse(serializer.data, safe=False)
+    
     elif request.method == "POST":
-        serializer = MemberSerializer(data=request.POST)
+        # data = JSONParser().parse(request)
+        serializer = MemberSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data, status=201)
         return JsonResponse(serializer.errors, status=400)
 
 
+@csrf_exempt
 def Member_detail(request, pk):
     try:
-        Member = Member.objects.get(Member_id=pk)
+        member = Member.objects.get(pk=pk)
     except Member.DoesNotExist:
-        return JsonResponse({"error": "Member not found"}, status=404)
+        return HttpResponse(status=404)
 
     if request.method == "GET":
         serializer = MemberSerializer(Member)
         return JsonResponse(serializer.data)
+    
     elif request.method == "PUT":
-        serializer = MemberSerializer(Member, data=request.data)
+        data = JSONParser().parse(request)
+        serializer = MemberSerializer(Member, data=data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data, status=200)
+            return JsonResponse(serializer.data)
         return JsonResponse(serializer.errors, status=400)
+    
     elif request.method == "DELETE":
         Member.delete()
-        return JsonResponse({"message": "Member deleted"}, status=204)
+        return HttpResponse(status=204)
