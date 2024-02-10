@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'books_platform.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'new',
+        'NAME': 'books_platform',
         'USER': 'postgres',
         'PASSWORD': 'backend',
         'HOST': 'localhost',
