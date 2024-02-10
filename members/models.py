@@ -34,9 +34,9 @@ class Member(models.Model):
     )
 
     # specific fields for reader and author
-    birth_date = models.DateField()
+    birth_date = models.DateField(default=None)
     gender = models.CharField(max_length=55, choices=Gender, default="M")
 
     # specific fields for publisher
-    address = models.OneToOneField(Address, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=20)
+    address = models.OneToOneField(Address, on_delete=models.CASCADE, default=None)
+    phone = models.CharField(max_length=20, default=None)
