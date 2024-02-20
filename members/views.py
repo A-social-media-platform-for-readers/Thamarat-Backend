@@ -48,65 +48,45 @@ from .serializers import *
 #         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(["GET"])
-def read_all_Members(req):
+@api_view(["GET", "POST"])
+def read_All_Create_Members(req):
+    if req.method == "GET":
+        Members = Member.objects.all()
+        jsndata = MemberSerializer(Members, many=True).data
+        return Response({"data": jsndata}, status=status.HTTP_200_OK)
 
-    objs = Member.objects.all()
-    jsndata = MemberSerializer(objs, many=True).data
-    finaldata = {"data": jsndata}
-
-    return Response(data=finaldata, status=status.HTTP_200_OK)
-
-
-def read_one_Member(req, ID):
-
-    objs = Member.objects.get(id=ID)
-    jsndata = MemberSerializer(objs, many=True).data
-    finaldata = {"data": jsndata}
-
-    return Response(data=finaldata, status=status.HTTP_200_OK)
+    elif req.method == "POST":
+        member = MemberSerializer(data=req.data)
+        if member.is_valid():
+            member.save()
+            return Response(member.data, status=status.HTTP_201_CREATED)
+        return Response(member.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["POST"])
-def create_Member(req):
+@api_view(["GET", "DELETE", "PATCH", "PUT"])
+def apis_Member(req, ID):
+    if req.method == "GET":
+        obj = Member.objects.get(id=ID)
+        jsndata = MemberSerializer(obj, many=False).data
+        finaldata = {"data": jsndata}
+        return Response(data=finaldata, status=status.HTTP_200_OK)
 
-    Member = MemberSerializer(data=req.data)
-    if Member.is_valid():
+    if req.method == "DELETE":
+        Member.objects.filter(id=ID).delete()
+        return Response(status.HTTP_204_NO_CONTENT)
 
-        Member.save()
+    if req.method == "PATCH":
+        t = Member.objects.get(id=ID)
+        st = MemberSerializer(instance=t, data=req.data, partial=True)
+        if st.is_valid():
+            st.save()
+            return Response(status.HTTP_200_OK)
+        return Response(st.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    return Response(status.HTTP_201_CREATED)
-
-
-@api_view(["DELETE"])
-def delete_Member(req, ID):
-
-    Member.objects.filter(id=ID).delete()
-
-    return Response(status.HTTP_204_NO_CONTENT)
-
-
-@api_view(["PATCH "])
-def update_Member(req, ID):
-
-    t = Member.objects.get(id=ID)
-    st = MemberSerializer(instance=t, data=req.data, partial=True)
-
-    if st.is_valid():
-
-        st.save()
-
-    return Response(status.HTTP_200_OK)
-
-
-@api_view(["PUT"])
-def update_whole_Member(req, ID):
-
-    t = Member.objects.get(id=ID)
-    st = MemberSerializer(instance=t, data=req.data, partial=False)
-
-    if st.is_valid():
-
-        st.save()
-
-    return Response(status.HTTP_200_OK)
+    if req.method == "PUT":
+        t = Member.objects.get(id=ID)
+        st = MemberSerializer(instance=t, data=req.data, partial=False)
+        if st.is_valid():
+            st.save()
+            return Response(status.HTTP_200_OK)
+        return Response(st.errors, status=status.HTTP_400_BAD_REQUEST)

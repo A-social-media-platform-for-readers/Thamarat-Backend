@@ -34,3 +34,6 @@ class Member(models.Model):
     # specific fields for publisher
     phone = models.CharField(max_length=20, default=None)
     address = models.OneToOneField(Address, on_delete=models.CASCADE, default=None)
+
+    #identity
+    #dataofmembership
