@@ -48,42 +48,65 @@ from .serializers import *
 #         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(['GET'])
-def all_Member(req):
-    
+@api_view(["GET"])
+def read_all_Members(req):
+
     objs = Member.objects.all()
     jsndata = MemberSerializer(objs, many=True).data
-    finaldata = {'data': jsndata}
+    finaldata = {"data": jsndata}
 
     return Response(data=finaldata, status=status.HTTP_200_OK)
 
-@api_view(['POST'])
-def add_Member(req):
-    
+
+def read_one_Member(req, ID):
+
+    objs = Member.objects.get(id=ID)
+    jsndata = MemberSerializer(objs, many=True).data
+    finaldata = {"data": jsndata}
+
+    return Response(data=finaldata, status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+def create_Member(req):
+
     Member = MemberSerializer(data=req.data)
-    if (Member.is_valid()):
+    if Member.is_valid():
 
         Member.save()
 
     return Response(status.HTTP_201_CREATED)
 
 
-@api_view(['DELETE'])
+@api_view(["DELETE"])
 def delete_Member(req, ID):
-    
+
     Member.objects.filter(id=ID).delete()
 
     return Response(status.HTTP_204_NO_CONTENT)
 
 
-@api_view(['PUT'])
+@api_view(["PATCH "])
 def update_Member(req, ID):
-    
-    t = Member.objects.filter(id=ID)[0]
+
+    t = Member.objects.get(id=ID)
     st = MemberSerializer(instance=t, data=req.data, partial=True)
-    
-    if (st.is_valid()):
-        
+
+    if st.is_valid():
+
+        st.save()
+
+    return Response(status.HTTP_200_OK)
+
+
+@api_view(["PUT"])
+def update_whole_Member(req, ID):
+
+    t = Member.objects.get(id=ID)
+    st = MemberSerializer(instance=t, data=req.data, partial=False)
+
+    if st.is_valid():
+
         st.save()
 
     return Response(status.HTTP_200_OK)
