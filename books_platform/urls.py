@@ -20,8 +20,9 @@ from members import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('api-token-auth/', views.CustomAuthToken.as_view()),
+    path("api/users/", views.ListUsers.as_view()),
+    path('api/token/auth/', views.CustomAuthToken.as_view()),
     # path("member", include("members.urls")),
-    path('member',views.read_All_Create_Members,),
+    path('member/',views.read_All_Create_Members,),
     path('member/<int:ID>',views.apis_Member,),
 ]
