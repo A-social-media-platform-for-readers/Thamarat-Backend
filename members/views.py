@@ -1,3 +1,7 @@
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
@@ -6,6 +10,14 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Member
 from .serializers import *
+from rest_framework.decorators import authentication_classes
+from rest_framework.decorators import  permission_classes
+
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+
+
+
 
 
 # @api_view(["GET", "POST"])
@@ -47,6 +59,32 @@ from .serializers import *
 #         Member.delete()
 #         return Response(status=status.HTTP_204_NO_CONTENT)
 
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, BasicAuthentication])
+@permission_classes([IsAuthenticated])
+def example_view(request, format=None):
+    content = {
+        'user': str(request.user),  # `django.contrib.auth.User` instance.
+        'auth': str(request.auth),  # None
+        # 'status': 'request was permitted' 
+    }
+    return Response(content)
+    
+
+class CustomAuthToken(ObtainAuthToken):
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'email': user.email
+        })
+    
 
 @api_view(["GET", "POST"])
 def read_All_Create_Members(req):
@@ -61,6 +99,7 @@ def read_All_Create_Members(req):
             member.save()
             return Response(member.data, status=status.HTTP_201_CREATED)
         return Response(member.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 
 @api_view(["GET", "DELETE", "PATCH", "PUT"])
@@ -90,3 +129,4 @@ def apis_Member(req, ID):
             st.save()
             return Response(status.HTTP_200_OK)
         return Response(st.errors, status=status.HTTP_400_BAD_REQUEST)
+
