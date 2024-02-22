@@ -35,12 +35,12 @@ class User(AbstractUser):
     date_joined = models.DateTimeField(default=timezone.now)
 
     # specific fields for reader and author
-    birth_date = models.DateField(default=None, blank=True)
+    birth_date = models.DateField(blank=True, null=True)
     gender = models.CharField(max_length=55, choices=Gender, blank=True)
 
     # specific fields for publisher
     phone = models.CharField(max_length=20, blank=True)
-    address = models.OneToOneField(Address, on_delete=models.CASCADE, blank=True)
+    address = models.OneToOneField(Address, on_delete=models.CASCADE, blank=True, null=True)
     username = None
 
     USERNAME_FIELD = "email"
