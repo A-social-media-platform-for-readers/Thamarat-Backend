@@ -43,5 +43,9 @@ class User(AbstractUser):
     address = models.OneToOneField(Address, on_delete=models.CASCADE, blank=True, null=True)
     username = None
 
+    # django depend on username in authentication process but 
+    # we want to depend on email in authentication process
+    # because email is unique field 
+    # so we have to manually set username field to email
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
