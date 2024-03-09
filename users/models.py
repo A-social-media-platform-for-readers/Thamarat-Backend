@@ -20,9 +20,9 @@ class Identity(models.TextChoices):
 
 class Address(models.Model):
     id = models.AutoField(primary_key=True)
-    street_address = models.CharField(max_length=255, blank=True)
-    city = models.CharField(max_length=255, blank=True)
-    state = models.CharField(max_length=255, blank=True)
+    location = models.CharField(max_length=255, blank=True)
+    # city = models.CharField(max_length=255, blank=True)
+    # state = models.CharField(max_length=255, blank=True)
     country = models.CharField(max_length=255, blank=True)
 
 
