@@ -36,4 +36,5 @@ urlpatterns = [
     path("api/update_book/<int:pk>", UpdateBook.as_view()),
     path("api/delete_book/<int:pk>", DeleteBook.as_view()),
     path("api/review_book/<int:pk>", ReviewBook.as_view()),
+    path('api/search_books', BookSearchView.as_view())
 ]

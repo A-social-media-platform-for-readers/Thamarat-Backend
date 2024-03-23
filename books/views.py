@@ -106,3 +106,29 @@ class ReviewBook(APIView):
                 return Response(serializer.data["rating"])
         except:
             return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)
+
+
+class BookSearchView(APIView):
+    def get(self, request):
+        # Get search query parameter (e.g., ?query=anystr)
+        query = request.query_params.get("query")
+        if not query:
+            return Response(
+                {"error": "Missing search query like ?query=anystr"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Implement search logic based on the query string
+        books = (
+            Book.objects.filter(title__icontains=query)
+            | Book.objects.filter(author__icontains=query)
+            | Book.objects.filter(genre__icontains=query)
+            | Book.objects.filter(title__trigram_similar=query)
+            | Book.objects.filter(author__trigram_similar=query)
+            | Book.objects.filter(genre__trigram_similar=query)
+            | Book.objects.filter(title__unaccent=query)
+            | Book.objects.filter(author__unaccent=query)
+            | Book.objects.filter(genre__unaccent=query)
+        )
+        serializer = BookSerializer(books, many=True)
+        return Response(serializer.data)
