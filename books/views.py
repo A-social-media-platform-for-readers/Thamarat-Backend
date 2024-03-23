@@ -53,7 +53,7 @@ class BookFilter(viewsets.ModelViewSet):
     pagination_class = BookPagination
 
     def list(self, request, genre):
-        queryset = self.get_queryset().filter(genre="sasa")
+        queryset = self.get_queryset().filter(genre=genre)
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
