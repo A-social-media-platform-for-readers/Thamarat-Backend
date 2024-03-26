@@ -6,12 +6,23 @@ from rest_framework import viewsets, pagination
 from rest_framework import status
 
 
-class CreateBook(APIView):
-    def post(self, request):
-        serializer = BookSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
+class CreateBook(viewsets.ModelViewSet):
+    # def post(self, request):
+    #     serializer = BookSerializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+    #     return Response(serializer.data)
+    queryset = Book.objects.none()
+    serializer_class = BookSerializer
+    http_method_names = ['post', ]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ListAllBooks(APIView):
@@ -132,3 +143,7 @@ class BookSearchView(APIView):
         )
         serializer = BookSerializer(books, many=True)
         return Response(serializer.data)
+
+# class BookViewSet(viewsets.ModelViewSet):
+#     serializer_class = BookSerializer
+#     queryset = Book.objects.all()
