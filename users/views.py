@@ -4,15 +4,25 @@ from rest_framework.exceptions import AuthenticationFailed
 from .serializers import UserSerializer
 from .models import User
 import jwt, datetime
+from rest_framework import status
+from rest_framework import viewsets
 
 
-class RegisterView(APIView):
-    def post(self, request):
-        serializer = UserSerializer(data=request.data)
+class RegisterView(viewsets.ModelViewSet):
+    # def post(self, request):
+    #     serializer = UserSerializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+    #     return Response(serializer.data)
+    queryset = User.objects.none()
+    serializer_class = UserSerializer
+    http_method_names = ['post', ]
+
+    def create(self, request):
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data)
-
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class LoginView(APIView):
     def post(self, request):

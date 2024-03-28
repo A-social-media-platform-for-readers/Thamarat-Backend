@@ -40,7 +40,7 @@ urlpatterns = [
         name="redoc",
     ),
     path("admin/", admin.site.urls),
-    path("api/register", RegisterView.as_view()),
+    path("api/register", RegisterView.as_view({"post": "create"})),
     path("api/login", LoginView.as_view()),
     path("api/user", UserView.as_view()),
     path("api/logout", LogoutView.as_view()),
