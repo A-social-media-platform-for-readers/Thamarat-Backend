@@ -6,27 +6,9 @@ from rest_framework import viewsets, pagination
 from rest_framework import status
 
 
-# start of the pagination api
+# Bais class of the pagination api classes
 class BookPagination(pagination.PageNumberPagination):
-    page_size = 4  # Number of books per page (default)
-
-
-# api to get some(4) books for every request
-# like facebook timeline
-# class BookViewSet(viewsets.ModelViewSet):
-#     queryset = Book.objects.all()
-#     serializer_class = BookSerializer
-#     pagination_class = BookPagination
-
-#     def list(self, request):
-#         queryset = self.get_queryset()
-#         page = self.paginate_queryset(queryset)
-#         if page is not None:
-#             serializer = self.get_serializer(page, many=True)
-#             return self.get_paginated_response(serializer.data)
-
-# serializer = self.get_serializer(queryset, many=True)
-# return Response(serializer.data)
+    page_size = 4  # Number of books per page
 
 
 class BookViewSet(viewsets.ModelViewSet):
@@ -35,7 +17,13 @@ class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
     pagination_class = BookPagination
 
-    def get_review(self, request, pk):
+
+class BookReview(viewsets.ModelViewSet):
+
+    serializer_class = BookSerializer
+    queryset = Book.objects.all()
+
+    def retrieve(self, request, pk):
         try:
             queryset = self.get_queryset().filter(id=pk).first()
             serializer = self.serializer_class(queryset)
@@ -46,7 +34,29 @@ class BookViewSet(viewsets.ModelViewSet):
         except:
             return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)
 
-    def search(self, request, string):
+
+class BookPaginationFilter(viewsets.ModelViewSet):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    pagination_class = BookPagination
+
+    def list(self, request, genre):
+        queryset = self.get_queryset().filter(genre=genre)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class BookSearch(viewsets.ModelViewSet):
+
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+    def list(self, request, string):
         # Get search query parameter (e.g., ?query=anystr)
         # query = request.query_params.get("query")
         # if not query:
@@ -70,19 +80,3 @@ class BookViewSet(viewsets.ModelViewSet):
         )
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
-
-    def pagination_list(self, request):
-        queryset = self.get_queryset()
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        else:
-            return Response({"test": "test"})
-
-    def pagination_filter(self, request, genre):
-        queryset = self.get_queryset().filter(genre=genre)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
