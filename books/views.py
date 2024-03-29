@@ -14,7 +14,9 @@ class CreateBook(viewsets.ModelViewSet):
     #     return Response(serializer.data)
     queryset = Book.objects.none()
     serializer_class = BookSerializer
-    http_method_names = ['post', ]
+    http_method_names = [
+        "post",
+    ]
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
@@ -106,19 +108,6 @@ class DeleteBook(APIView):
             return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)
 
 
-class ReviewBook(APIView):
-    def get(self, request, pk):
-        try:
-            book = Book.objects.get(id=pk)
-            serializer = BookSerializer(book)
-            if serializer.data["rating"] == None:
-                return Response("there is no rate")
-            else:
-                return Response(serializer.data["rating"])
-        except:
-            return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)
-
-
 class BookSearchView(APIView):
     def get(self, request):
         # Get search query parameter (e.g., ?query=anystr)
@@ -144,6 +133,18 @@ class BookSearchView(APIView):
         serializer = BookSerializer(books, many=True)
         return Response(serializer.data)
 
-# class BookViewSet(viewsets.ModelViewSet):
-#     serializer_class = BookSerializer
-#     queryset = Book.objects.all()
+
+class BookViewSet(viewsets.ModelViewSet):
+    serializer_class = BookSerializer
+    queryset = Book.objects.all()
+
+    def Review(self, request, pk):
+        try:
+            queryset = self.get_queryset().filter(id=pk).first()
+            serializer = self.serializer_class(queryset)
+            if serializer.data["rating"] == None:
+                return Response("there is no rate")
+            else:
+                return Response(serializer.data["rating"])
+        except:
+            return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)

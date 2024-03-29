@@ -25,9 +25,18 @@ from django.urls import path, include
 
 from users.views import *
 from books.views import *
-# from books.routers import router
+
+from rest_framework.routers import DefaultRouter
+from books.views import BookViewSet
+
+
+BookRouter = DefaultRouter()
+BookRouter.register(r"book", BookViewSet)
 
 urlpatterns = [
+    # admin end point
+    path("admin/", admin.site.urls),
+    # API auto documentation end points
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "api/schema/swagger-ui/",
@@ -39,20 +48,22 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
-    path("admin/", admin.site.urls),
-    path("api/register", RegisterView.as_view({"post": "create"})),
-    path("api/login", LoginView.as_view()),
-    path("api/user", UserView.as_view()),
-    path("api/logout", LogoutView.as_view()),
-
-    # path("", include(router.urls)),
-    path("api/create_book", CreateBook.as_view({"post": "create"})),
-    path("api/all_books", ListAllBooks.as_view()),
-    path("api/get_books", BookViewSet.as_view({"get": "list"})),
-    path("api/get_book/<int:pk>", RetrieveBook.as_view()),
-    path("api/filter_books/<str:genre>", BookFilter.as_view({"get": "list"})),
-    path("api/update_book/<int:pk>", UpdateBook.as_view()),
-    path("api/delete_book/<int:pk>", DeleteBook.as_view()),
-    path("api/review_book/<int:pk>", ReviewBook.as_view()),
-    path("api/search_books", BookSearchView.as_view()),
+    # User authentication end points
+    path("auth/register/", RegisterView.as_view({"post": "create"})),
+    path("auth/login/", LoginView.as_view()),
+    path("auth/user/", UserView.as_view()),
+    path("auth/logout/", LogoutView.as_view()),
+    # book end points
+    path("", include(BookRouter.urls)),
+    # path("api/create_book", CreateBook.as_view({"post": "create"})),
+    # path("api/all_books", ListAllBooks.as_view()),
+    # path("api/get_book/<int:pk>", RetrieveBook.as_view()),
+    # path("api/update_book/<int:pk>", UpdateBook.as_view()),
+    # path("api/delete_book/<int:pk>", DeleteBook.as_view()),
+    path("book/get_books/", BookViewSet.as_view({"get": "list"})),
+    path("book/filter_books/<str:genre>/", BookFilter.as_view({"get": "list"})),
+    # path("book/review_book/<int:pk>/", ReviewBook.as_view()),
+    path("book/search_books/", BookSearchView.as_view()),
+    path("book/review_book/<int:pk>/", BookViewSet.as_view({"get": "Review"})),
+    
 ]
