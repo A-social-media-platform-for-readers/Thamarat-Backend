@@ -7,13 +7,11 @@ class Book(models.Model):
     author = models.CharField(max_length=255)
     rate = models.FloatField(
         validators=[MinValueValidator(0.0), MaxValueValidator(5.0)],
-        blank=True,
-        null=True,
+        default=0.0,
     )
-    price = models.FloatField(
-        validators=[MinValueValidator(0.0), MaxValueValidator(10000.0)],
-        blank=True,
-        null=True,
+    price = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(10000)],
+        default=0,
     )
     genre = models.CharField(max_length=100, blank=True, null=True)
     publisher = models.CharField(max_length=255, blank=True, null=True)

@@ -55,7 +55,18 @@ urlpatterns = [
     path("auth/logout/", LogoutView.as_view()),
     # book end points
     path("", include(BookRouter.urls)),
-    path("books/pagination_filter/<str:genre>/", BookPaginationFilter.as_view({"get": "list"})),
+    path(
+        "books/pagination_filter/<str:genre>/",
+        BookPaginationFilter.as_view({"get": "list"}),
+    ),
+    path(
+        "books/pagination_books_by_price/<int:intger>/",
+        BookPaginationByPrice.as_view({"get": "list"}),
+    ),
+    path(
+        "books/pagination_high_rate/",
+        BookPaginationHighRateBooks.as_view({"get": "list"}),
+    ),
     path("books/review/<int:pk>/", BookReview.as_view({"get": "retrieve"})),
     path("books/search/<str:string>/", BookSearch.as_view({"get": "list"})),
 ]

@@ -41,14 +41,57 @@ class BookPaginationFilter(viewsets.ModelViewSet):
     pagination_class = BookPagination
 
     def list(self, request, genre):
-        queryset = self.get_queryset().filter(genre=genre)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+        try:
+            queryset = (
+                self.get_queryset().filter(genre=genre)
+            )
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+        except:
+            return Response("Genre Not Found", status=status.HTTP_400_BAD_REQUEST)
+
+
+class BookPaginationByPrice(viewsets.ModelViewSet):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    pagination_class = BookPagination
+
+    def list(self, request, intger):
+        try:
+            queryset = self.get_queryset().filter(price=intger)
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+        except:
+            return Response("Genre Not Found", status=status.HTTP_400_BAD_REQUEST)
+
+
+class BookPaginationHighRateBooks(viewsets.ModelViewSet):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    pagination_class = BookPagination
+
+    def list(self, request):
+        try:
+            queryset = self.get_queryset().order_by("-rate").values()
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+        except:
+            return Response("Genre Not Found", status=status.HTTP_400_BAD_REQUEST)
 
 
 class BookSearch(viewsets.ModelViewSet):
