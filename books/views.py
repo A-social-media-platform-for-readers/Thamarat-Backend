@@ -6,34 +6,6 @@ from rest_framework import viewsets, pagination
 from rest_framework import status
 
 
-class CreateBook(viewsets.ModelViewSet):
-    # def post(self, request):
-    #     serializer = BookSerializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save()
-    #     return Response(serializer.data)
-    queryset = Book.objects.none()
-    serializer_class = BookSerializer
-    http_method_names = [
-        "post",
-    ]
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ListAllBooks(APIView):
-    def get(self, request):
-        books = Book.objects.all()
-        serializer = BookSerializer(books, many=True)
-        return Response(serializer.data)
-
-
 # start of the pagination api
 class BookPagination(pagination.PageNumberPagination):
     page_size = 4  # Number of books per page (default)
@@ -76,38 +48,6 @@ class BookFilter(viewsets.ModelViewSet):
 # end of the pagination api
 
 
-class RetrieveBook(APIView):
-    def get(self, request, pk):
-        try:
-            book = Book.objects.get(id=pk)
-            serializer = BookSerializer(book)
-            return Response(serializer.data)
-        except:
-            return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)
-
-
-class UpdateBook(APIView):
-    def put(self, request, pk):
-        try:
-            book = Book.objects.get(id=pk)
-            serializer = BookSerializer(instance=book, data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data)
-        except:
-            return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)
-
-
-class DeleteBook(APIView):
-    def delete(self, request, pk):
-        try:
-            book = Book.objects.get(id=pk)
-            book.delete()
-            return Response("Book Deleted")
-        except:
-            return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)
-
-
 class BookSearchView(APIView):
     def get(self, request):
         # Get search query parameter (e.g., ?query=anystr)
@@ -138,7 +78,7 @@ class BookViewSet(viewsets.ModelViewSet):
     serializer_class = BookSerializer
     queryset = Book.objects.all()
 
-    def Review(self, request, pk):
+    def get_review(self, request, pk):
         try:
             queryset = self.get_queryset().filter(id=pk).first()
             serializer = self.serializer_class(queryset)

@@ -62,8 +62,7 @@ urlpatterns = [
     # path("api/delete_book/<int:pk>", DeleteBook.as_view()),
     path("book/get_books/", BookViewSet.as_view({"get": "list"})),
     path("book/filter_books/<str:genre>/", BookFilter.as_view({"get": "list"})),
-    # path("book/review_book/<int:pk>/", ReviewBook.as_view()),
     path("book/search_books/", BookSearchView.as_view()),
-    path("book/review_book/<int:pk>/", BookViewSet.as_view({"get": "Review"})),
+    path("book/review/<int:pk>/", BookViewSet.as_view({"get": "get_review"})),
     
 ]
