@@ -55,14 +55,15 @@ urlpatterns = [
     path("auth/logout/", LogoutView.as_view()),
     # book end points
     path("", include(BookRouter.urls)),
-    # path("api/create_book", CreateBook.as_view({"post": "create"})),
-    # path("api/all_books", ListAllBooks.as_view()),
-    # path("api/get_book/<int:pk>", RetrieveBook.as_view()),
-    # path("api/update_book/<int:pk>", UpdateBook.as_view()),
-    # path("api/delete_book/<int:pk>", DeleteBook.as_view()),
     path("book/get_books/", BookViewSet.as_view({"get": "list"})),
-    path("book/filter_books/<str:genre>/", BookFilter.as_view({"get": "list"})),
-    path("book/search_books/", BookSearchView.as_view()),
+    path(
+        "book/pagination_list/",
+        BookViewSet.as_view({"get": "pagination_list"}),
+    ),
+    path(
+        "book/pagination_filter/<str:genre>/",
+        BookViewSet.as_view({"get": "pagination_filter"}),
+    ),
     path("book/review/<int:pk>/", BookViewSet.as_view({"get": "get_review"})),
-    
+    path("book/search/<str:string>/", BookViewSet.as_view({"get": "search"})),
 ]
