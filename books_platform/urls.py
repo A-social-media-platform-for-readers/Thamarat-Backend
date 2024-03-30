@@ -27,7 +27,6 @@ from users.views import *
 from books.views import *
 
 from rest_framework.routers import DefaultRouter
-from books.views import BookViewSet
 
 
 BookRouter = DefaultRouter()
@@ -56,16 +55,24 @@ urlpatterns = [
     # book end points
     path("", include(BookRouter.urls)),
     path(
-        "books/pagination_filter/<str:genre>/",
-        BookPaginationFilter.as_view({"get": "list"}),
+        "books-pagination-filter-genre/<str:genre>/",
+        BookPaginationFilterGenre.as_view({"get": "list"}),
+    ),
+        path(
+        "books-pagination-filter-genre-price/<str:genre>/<int:min_value>/<int:max_value>/",
+        BookPaginationFilterGenreAndPrice.as_view({"get": "list"}),
     ),
     path(
-        "books/pagination_books_by_price/<int:intger>/",
-        BookPaginationByPrice.as_view({"get": "list"}),
+        "books-pagination-free-books/",
+        BookPaginationFreeBooks.as_view({"get": "list"}),
     ),
     path(
-        "books/pagination_high_rate/",
+        "books-pagination-high-rate/",
         BookPaginationHighRateBooks.as_view({"get": "list"}),
+    ),
+    path(
+        "books-pagination-popular-books/",
+        BookPaginationPopularBooks.as_view({"get": "list"}),
     ),
     path("books/review/<int:pk>/", BookReview.as_view({"get": "retrieve"})),
     path("books/search/<str:string>/", BookSearch.as_view({"get": "list"})),

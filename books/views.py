@@ -35,15 +35,37 @@ class BookReview(viewsets.ModelViewSet):
             return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)
 
 
-class BookPaginationFilter(viewsets.ModelViewSet):
+class BookPaginationFilterGenre(viewsets.ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     pagination_class = BookPagination
 
     def list(self, request, genre):
         try:
+            queryset = self.get_queryset().filter(genre=genre)
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+        except:
+            return Response("Genre Not Found", status=status.HTTP_400_BAD_REQUEST)
+
+
+class BookPaginationFilterGenreAndPrice(viewsets.ModelViewSet):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    pagination_class = BookPagination
+
+    def list(self, request, genre, min_value, max_value):
+        try:
             queryset = (
-                self.get_queryset().filter(genre=genre)
+                self.get_queryset()
+                .filter(price__range=(min_value, max_value), genre=genre)
+                .order_by("-price")
+                .values()
             )
             page = self.paginate_queryset(queryset)
             if page is not None:
@@ -56,14 +78,14 @@ class BookPaginationFilter(viewsets.ModelViewSet):
             return Response("Genre Not Found", status=status.HTTP_400_BAD_REQUEST)
 
 
-class BookPaginationByPrice(viewsets.ModelViewSet):
+class BookPaginationFreeBooks(viewsets.ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     pagination_class = BookPagination
 
-    def list(self, request, intger):
+    def list(self, request):
         try:
-            queryset = self.get_queryset().filter(price=intger)
+            queryset = self.get_queryset().filter(price=0)
             page = self.paginate_queryset(queryset)
             if page is not None:
                 serializer = self.get_serializer(page, many=True)
@@ -83,6 +105,29 @@ class BookPaginationHighRateBooks(viewsets.ModelViewSet):
     def list(self, request):
         try:
             queryset = self.get_queryset().order_by("-rate").values()
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+        except:
+            return Response("Genre Not Found", status=status.HTTP_400_BAD_REQUEST)
+
+
+class BookPaginationPopularBooks(viewsets.ModelViewSet):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    pagination_class = BookPagination
+
+    def list(self, request):
+        try:
+            queryset = (
+                self.get_queryset()
+                .order_by("-readers_count", "-to_read_count")
+                .values()
+            )
             page = self.paginate_queryset(queryset)
             if page is not None:
                 serializer = self.get_serializer(page, many=True)
