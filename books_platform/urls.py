@@ -54,6 +54,8 @@ urlpatterns = [
     path("auth/logout/", LogoutView.as_view()),
     # book end points
     path("", include(BookRouter.urls)),
+    path("books/review/<int:pk>/", BookReview.as_view({"get": "retrieve"})),
+    path("books/search/<str:string>/", BookSearch.as_view({"get": "list"})),
     path(
         "books-pagination-filter-genre/<str:genre>/",
         BookPaginationFilterGenre.as_view({"get": "list"}),
@@ -74,6 +76,18 @@ urlpatterns = [
         "books-pagination-popular-books/",
         BookPaginationPopularBooks.as_view({"get": "list"}),
     ),
-    path("books/review/<int:pk>/", BookReview.as_view({"get": "retrieve"})),
-    path("books/search/<str:string>/", BookSearch.as_view({"get": "list"})),
+    # book summary end points
+    path(
+        "books-summary-create/<int:book_id>/",
+        BookSummaryCreate.as_view({"post": "create"}),
+    ),
+    path("books-summary-list/<int:book_id>/", BookSummaryList.as_view({"get": "list"})),
+    path(
+        "books-summary-update/<int:book_id>/",
+        BookSummaryUpdate.as_view({"put": "update"}),
+    ),
+    path(
+        "books-summary-delete/<int:book_id>/",
+        BookSummaryDelete.as_view({"delete": "destroy"}),
+    ),
 ]

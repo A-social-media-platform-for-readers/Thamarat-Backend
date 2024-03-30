@@ -24,3 +24,8 @@ class Book(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class BookSummary(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    summary = models.FileField(upload_to="media/summary_files/", default=None)

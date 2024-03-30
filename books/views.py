@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import BookSerializer
-from .models import Book
+from .serializers import BookSerializer, BookSummarySerializer
+from .models import Book, BookSummary
 from rest_framework import viewsets, pagination
 from rest_framework import status
 
@@ -176,3 +176,69 @@ class BookSearch(viewsets.ModelViewSet):
         )
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
+
+
+class BookSummaryCreate(viewsets.ModelViewSet):
+    queryset = Book.objects.all()
+    serializer_class = BookSummarySerializer
+
+    def create(self, request, book_id):
+        try:
+            book = self.get_queryset().get(id=book_id)
+        except Book.DoesNotExist:
+            return Response(
+                {"error": "Book not found"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(book=book)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class BookSummaryList(viewsets.ModelViewSet):
+    queryset = BookSummary.objects.all()
+    serializer_class = BookSummarySerializer
+
+    def list(self, request, book_id):
+        try:
+            book = Book.objects.get(id=book_id)
+        except Book.DoesNotExist:
+            return Response(
+                {"error": "Book not found"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        queryset = self.get_queryset().filter(book=book)
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
+
+
+class BookSummaryUpdate(viewsets.ModelViewSet):
+    queryset = BookSummary.objects.all()
+    serializer_class = BookSummarySerializer
+
+    def update(self, request, book_id):
+        try:
+            bookSummary = self.get_queryset().get(id=book_id)
+        except BookSummary.DoesNotExist:
+            return Response(
+                {"error": "Book not found"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = self.serializer_class(bookSummary, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class BookSummaryDelete(viewsets.ModelViewSet):
+    queryset = BookSummary.objects.all()
+    serializer_class = BookSummarySerializer
+
+    def destroy(self, request, book_id):
+        try:
+            bookSummary = self.get_queryset().get(id=book_id)
+        except BookSummary.DoesNotExist:
+            return Response(
+                {"error": "Book not found"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        bookSummary.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
