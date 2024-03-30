@@ -58,8 +58,8 @@ urlpatterns = [
         "books-pagination-filter-genre/<str:genre>/",
         BookPaginationFilterGenre.as_view({"get": "list"}),
     ),
-        path(
-        "books-pagination-filter-genre-price/<str:genre>/<int:min_value>/<int:max_value>/",
+    path(
+        "books-pagination-filter-genre-price/<str:genre>/<int:min_value>/<int:max_value>/<str:order_from>/",
         BookPaginationFilterGenreAndPrice.as_view({"get": "list"}),
     ),
     path(

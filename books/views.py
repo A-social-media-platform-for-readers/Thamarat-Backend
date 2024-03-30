@@ -59,14 +59,22 @@ class BookPaginationFilterGenreAndPrice(viewsets.ModelViewSet):
     serializer_class = BookSerializer
     pagination_class = BookPagination
 
-    def list(self, request, genre, min_value, max_value):
+    def list(self, request, genre, min_value, max_value, order_from):
         try:
-            queryset = (
-                self.get_queryset()
-                .filter(price__range=(min_value, max_value), genre=genre)
-                .order_by("-price")
-                .values()
-            )
+            if order_from == "DESC":
+                queryset = (
+                    self.get_queryset()
+                    .filter(price__range=(min_value, max_value), genre=genre)
+                    .order_by("-price")
+                    .values()
+                )
+            else:
+                queryset = (
+                    self.get_queryset()
+                    .filter(price__range=(min_value, max_value), genre=genre)
+                    .order_by("price")
+                    .values()
+                )
             page = self.paginate_queryset(queryset)
             if page is not None:
                 serializer = self.get_serializer(page, many=True)
