@@ -21,6 +21,8 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 from django.contrib import admin
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
 from django.urls import path, include
 
 from users.views import *
@@ -91,3 +93,5 @@ urlpatterns = [
         BookSummaryDelete.as_view({"delete": "destroy"}),
     ),
 ]
+
+urlpatterns += staticfiles_urlpatterns()
