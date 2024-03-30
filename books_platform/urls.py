@@ -51,9 +51,9 @@ urlpatterns = [
     ),
     # User authentication end points
     path("auth/register/", RegisterView.as_view({"post": "create"})),
-    path("auth/login/", LoginView.as_view()),
-    path("auth/user/", UserView.as_view()),
-    path("auth/logout/", LogoutView.as_view()),
+    path("auth/login/", LoginView.as_view({"post": "login"})),
+    path("auth/user/", UserView.as_view({"get": "retrieve"})),
+    path("auth/logout/", LogoutView.as_view({"post": "logout"})),
     # book end points
     path("", include(BookRouter.urls)),
     path("books/review/<int:pk>/", BookReview.as_view({"get": "retrieve"})),

@@ -16,7 +16,7 @@ class RegisterView(viewsets.ModelViewSet):
     #     return Response(serializer.data)
     queryset = User.objects.none()
     serializer_class = UserSerializer
-    http_method_names = ['post', ]
+    # http_method_names = ['post', ]
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -24,12 +24,17 @@ class RegisterView(viewsets.ModelViewSet):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-class LoginView(APIView):
-    def post(self, request):
+
+class LoginView(viewsets.ModelViewSet):
+    
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    
+    def login(self, request):
         email = request.data["email"]
         password = request.data["password"]
 
-        user = User.objects.filter(email=email).first()
+        user = self.get_queryset().filter(email=email).first()
 
         if user is None:
             raise AuthenticationFailed("User not found!")
@@ -52,9 +57,12 @@ class LoginView(APIView):
         return response
 
 
-class UserView(APIView):
+class UserView(viewsets.ModelViewSet):
 
-    def get(self, request):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    
+    def retrieve(self, request):
         token = request.COOKIES.get("jwt")
 
         if not token:
@@ -65,13 +73,17 @@ class UserView(APIView):
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed("Unauthenticated!")
 
-        user = User.objects.filter(id=payload["id"]).first()
-        serializer = UserSerializer(user)
+        user = self.get_queryset().filter(id=payload["id"]).first()
+        serializer = self.serializer_class(user)
         return Response(serializer.data)
 
 
-class LogoutView(APIView):
-    def post(self, request):
+class LogoutView(viewsets.ModelViewSet):
+    
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    
+    def logout(self, request):
         response = Response()
         response.delete_cookie("jwt")
         response.data = {"message": "success"}
