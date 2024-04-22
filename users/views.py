@@ -9,14 +9,12 @@ from rest_framework import viewsets
 
 
 class RegisterView(viewsets.ModelViewSet):
-    # def post(self, request):
-    #     serializer = UserSerializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save()
-    #     return Response(serializer.data)
+    """
+    Create a new user.
+    """
+
     queryset = User.objects.none()
     serializer_class = UserSerializer
-    # http_method_names = ['post', ]
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -26,10 +24,13 @@ class RegisterView(viewsets.ModelViewSet):
 
 
 class LoginView(viewsets.ModelViewSet):
-    
+    """
+    User Login
+    """
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    
+
     def login(self, request):
         email = request.data["email"]
         password = request.data["password"]
@@ -58,12 +59,20 @@ class LoginView(viewsets.ModelViewSet):
 
 
 class UserView(viewsets.ModelViewSet):
+    """
+    Check Authentication and Retrieve User
+    """
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    
-    def retrieve(self, request):
-        token = request.COOKIES.get("jwt")
+
+    def check_auth(self, request):
+        """
+        Check Authentication function is used for view apis by
+        import it in views.py to secure our apis
+        """
+
+        token = request.headers.get("jwt")
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -73,16 +82,27 @@ class UserView(viewsets.ModelViewSet):
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed("Unauthenticated!")
 
+        return payload
+
+    def retrieve(self, request):
+        """
+        Retrieve User after checking authentication
+        """
+
+        payload = self.check_auth(request)
         user = self.get_queryset().filter(id=payload["id"]).first()
         serializer = self.serializer_class(user)
         return Response(serializer.data)
 
 
 class LogoutView(viewsets.ModelViewSet):
-    
+    """
+    Logout User
+    """
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    
+
     def logout(self, request):
         response = Response()
         response.delete_cookie("jwt")

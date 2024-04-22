@@ -11,8 +11,6 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
-
-# from dj_database_url import config
 import dj_database_url
 import os
 
@@ -31,7 +29,6 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 # Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -41,7 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.postgres",  # for postgres search support(trigram)
     "rest_framework",
-    "drf_spectacular",
+    "drf_spectacular",  # for api auto documentation
     "corsheaders",
     "users",
     "books",
@@ -93,17 +90,10 @@ WSGI_APPLICATION = "books_platform.wsgi.application"
 #     }
 # }
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "books_platform",
-        "USER": "books_platform_user",
-        "PASSWORD": "IF34Gk8ekBEnBiJKSy4m1N7BWTkPjgT6",
-        "PORT": "5432",
-    }
+    "default": dj_database_url.parse(
+        "postgres://books_platform_user:IF34Gk8ekBEnBiJKSy4m1N7BWTkPjgT6@dpg-co3rpksf7o1s738l1l80-a.oregon-postgres.render.com/books_platform"
+    )
 }
-DATABASES["default"] = dj_database_url.parse(
-    "postgres://books_platform_user:IF34Gk8ekBEnBiJKSy4m1N7BWTkPjgT6@dpg-co3rpksf7o1s738l1l80-a.oregon-postgres.render.com/books_platform"
-)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -148,9 +138,10 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 REST_FRAMEWORK = {
-    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",  # for api auto documentation
 }
 
+# Spectacular settings for api auto documentation
 SPECTACULAR_SETTINGS = {
     "TITLE": "Your Project API",
     "DESCRIPTION": "Your project description",

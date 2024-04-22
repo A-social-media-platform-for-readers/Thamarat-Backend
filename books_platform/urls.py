@@ -28,11 +28,11 @@ from django.urls import path, include
 from users.views import *
 from books.views import *
 
-from rest_framework.routers import DefaultRouter
+# from rest_framework.routers import DefaultRouter
 
 
-BookRouter = DefaultRouter()
-BookRouter.register(r"books", BookViewSet)
+# BookRouter = DefaultRouter()
+# BookRouter.register(r"books", BookViewSet)
 
 urlpatterns = [
     # admin end point
@@ -55,42 +55,53 @@ urlpatterns = [
     path("auth/user/", UserView.as_view({"get": "retrieve"})),
     path("auth/logout/", LogoutView.as_view({"post": "logout"})),
     # book end points
-    path("", include(BookRouter.urls)),
+    # path("", include(BookRouter.urls)),
+    path("books/", BookViewSet.as_view({"get": "list", "post": "create"})),
+    path(
+        "books/<int:pk>/",
+        BookViewSet.as_view(
+            {
+                "get": "retrieve",
+                "put": "update",
+                "patch": "partial_update",
+                "delete": "destroy",
+            }
+        ),
+    ),
     path("books/review/<int:pk>/", BookReview.as_view({"get": "retrieve"})),
     path("books/search/<str:string>/", BookSearch.as_view({"get": "list"})),
     path(
-        "books-pagination-filter-genre/<str:genre>/",
-        BookPaginationFilterGenre.as_view({"get": "list"}),
+        "books/filter-genre/<str:genre>/",
+        BookFilterGenre.as_view({"get": "list"}),
     ),
     path(
-        "books-pagination-filter-genre-price/<str:genre>/<int:min_value>/<int:max_value>/<str:order_from>/",
-        BookPaginationFilterGenreAndPrice.as_view({"get": "list"}),
+        "books/filter-genre-price/<str:genre>/<int:min_value>/<int:max_value>/<str:order_from>/",
+        BookFilterGenreAndPrice.as_view({"get": "list"}),
     ),
     path(
-        "books-pagination-free-books/",
-        BookPaginationFreeBooks.as_view({"get": "list"}),
+        "books/free-books/",
+        FreeBooks.as_view({"get": "list"}),
     ),
     path(
-        "books-pagination-high-rate/",
-        BookPaginationHighRateBooks.as_view({"get": "list"}),
+        "books/high-rate/",
+        HigherRatingBooks.as_view({"get": "list"}),
     ),
     path(
-        "books-pagination-popular-books/",
-        BookPaginationPopularBooks.as_view({"get": "list"}),
+        "books/popular-books/",
+        PopularBooks.as_view({"get": "list"}),
     ),
     # book summary end points
     path(
-        "books-summary-create/<int:book_id>/",
+        "books-summary/create/<int:book_id>/",
         BookSummaryCreate.as_view({"post": "create"}),
     ),
-    path("books-summary-list/<int:book_id>/", BookSummaryList.as_view({"get": "list"})),
     path(
-        "books-summary-update/<int:book_id>/",
-        BookSummaryUpdate.as_view({"put": "update"}),
+        "books-summary/list/<int:book_id>/",
+        BookSummaryList.as_view({"get": "list"}),
     ),
     path(
-        "books-summary-delete/<int:book_id>/",
-        BookSummaryDelete.as_view({"delete": "destroy"}),
+        "books-summary/<int:book_id>/<int:summary_id>/",
+        BookSummaryUdateDelete.as_view({"put": "update", "delete": "destroy"}),
     ),
 ]
 

@@ -8,17 +8,29 @@ from django.contrib.auth.models import AbstractUser
 
 
 class Gender(models.TextChoices):
+    """
+    Gender choices for user
+    """
+
     MALE = "M", "Male"
     FEMALE = "F", "Female"
 
 
 class Identity(models.TextChoices):
+    """
+    Identity choices for user
+    """
+
     READER = "READER"
     AUTHOR = "AUTHOR"
     PUBLISHER = "PUBLISHER"
 
 
 class Address(models.Model):
+    """
+    Address model for user
+    """
+
     id = models.AutoField(primary_key=True)
     location = models.CharField(max_length=255, blank=True)
     # city = models.CharField(max_length=255, blank=True)
@@ -27,6 +39,10 @@ class Address(models.Model):
 
 
 class User(AbstractUser):
+    """
+    User override model for authentication
+    """
+
     id = models.AutoField(primary_key=True)
     identity = models.CharField(max_length=55, choices=Identity)
     name = models.CharField(max_length=255)

@@ -3,6 +3,13 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Book(models.Model):
+    """
+    Model representing a book.
+
+    Methods:
+        __str__(): Returns the title of the book.
+    """
+
     title = models.CharField(max_length=255)
     author = models.CharField(max_length=255)
     rate = models.FloatField(
@@ -23,9 +30,17 @@ class Book(models.Model):
     pdf_file = models.FileField(upload_to="media/pdf_files/", default=None)
 
     def __str__(self):
+        """
+        Returns the title of the book.
+        """
+
         return self.title
 
 
 class BookSummary(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    """
+    Model representing a summary of a book.
+    """
+
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, blank=True)
     summary = models.FileField(upload_to="media/summary_files/", default=None)
