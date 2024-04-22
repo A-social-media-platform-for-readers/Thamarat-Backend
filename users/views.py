@@ -72,7 +72,7 @@ class UserView(viewsets.ModelViewSet):
         import it in views.py to secure our apis
         """
 
-        token = request.headers.get("jwt")
+        token = request.headers.get("Authorization")
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
