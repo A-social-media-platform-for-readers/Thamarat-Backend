@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "users",
     "books",
+    "social_media",
 ]
 
 MIDDLEWARE = [

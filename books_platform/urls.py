@@ -27,6 +27,7 @@ from django.urls import path, include
 
 from users.views import *
 from books.views import *
+from social_media.views import *
 
 # from rest_framework.routers import DefaultRouter
 
@@ -52,8 +53,12 @@ urlpatterns = [
     # User authentication end points
     path("auth/register/", RegisterView.as_view({"post": "create"})),
     path("auth/login/", LoginView.as_view({"post": "login"})),
-    path("auth/user/", UserView.as_view({"get": "retrieve"})),
     path("auth/logout/", LogoutView.as_view({"post": "logout"})),
+    path("auth/user/", UserView.as_view({"get": "retrieve"})),
+    path(
+        "auth/user/<int:pk>/",
+        UserViewSet.as_view({"get": "retrieve", "put": "update"}),
+    ),
     # book end points
     # path("", include(BookRouter.urls)),
     path("books/", BookViewSet.as_view({"get": "list", "post": "create"})),
@@ -102,6 +107,19 @@ urlpatterns = [
     path(
         "books-summary/<int:book_id>/<int:summary_id>/",
         BookSummaryUdateDelete.as_view({"put": "update", "delete": "destroy"}),
+    ),
+    # social media end points
+    path(
+        "social-media/posts/",
+        PostViewSet.as_view({"get": "list", "post": "create"}),
+    ),
+    path(
+        "social-media/posts/<int:pk>/",
+        PostViewSet.as_view({"get": "retrieve", "put": "update", "delete": "destroy"}),
+    ),
+    path(
+        "social-media/posts/likes-counter/<int:pk>/",
+        PostLikeViewSet.as_view({"post": "like", "delete": "unlike"}),
     ),
 ]
 

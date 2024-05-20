@@ -72,7 +72,7 @@ class UserView(viewsets.ModelViewSet):
         import it in views.py to secure our apis
         """
 
-        token = request.headers.get("Authorization")
+        token = request.headers.get("Authorization") or request.COOKIES.get("jwt")
 
         if not token:
             raise AuthenticationFailed("Unauthenticated!")
@@ -93,6 +93,37 @@ class UserView(viewsets.ModelViewSet):
         user = self.get_queryset().filter(id=payload["id"]).first()
         serializer = self.serializer_class(user)
         return Response(serializer.data)
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    User CRUD
+    """
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def retrieve(self, request, pk):
+        """
+        Retrieve user by id
+        """
+
+        UserView.check_auth(self, request)
+        user = self.get_queryset().filter(id=pk).first()
+        serializer = self.serializer_class(user)
+        return Response(serializer.data)
+    
+    def update(self, request, pk):
+        """
+        Update User
+        """
+
+        UserView.check_auth(self, request)
+        user = self.get_queryset().filter(id=pk).first()
+        serializer = self.serializer_class(user, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class LogoutView(viewsets.ModelViewSet):
