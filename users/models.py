@@ -50,6 +50,7 @@ class User(AbstractUser):
     password = models.CharField(max_length=255)
     date_joined = models.DateTimeField(default=timezone.now)
     profile_image = models.ImageField(upload_to="media/profile_images/", blank=True)
+
     # specific fields for reader and author
     birth_date = models.DateField(blank=True, null=True)
     gender = models.CharField(max_length=55, choices=Gender, blank=True)
@@ -59,11 +60,11 @@ class User(AbstractUser):
     address = models.OneToOneField(
         Address, on_delete=models.CASCADE, blank=True, null=True
     )
-    username = None
 
     # django depend on username in authentication process but
     # we want to depend on email in authentication process
     # because email is unique field
     # so we have to manually set username field to email
+    username = None
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

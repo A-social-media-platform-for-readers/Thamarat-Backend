@@ -20,6 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
             "gender",
             "phone",
             "address",
+            "profile_image",
         ]
         extra_kwargs = {"password": {"write_only": True}}
 
