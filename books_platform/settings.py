@@ -80,21 +80,21 @@ WSGI_APPLICATION = "books_platform.wsgi.application"
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "books_platform",
-        "USER": "postgres",
-        "PASSWORD": "backend",
-        "HOST": "localhost",
-        "PORT": "5432",
-    }
-}
 # DATABASES = {
-#     "default": dj_database_url.parse(
-#         "postgres://books_platform_user:IF34Gk8ekBEnBiJKSy4m1N7BWTkPjgT6@dpg-co3rpksf7o1s738l1l80-a.oregon-postgres.render.com/books_platform"
-#     )
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": "books_platform",
+#         "USER": "postgres",
+#         "PASSWORD": "backend",
+#         "HOST": "localhost",
+#         "PORT": "5432",
+#     }
 # }
+DATABASES = {
+    "default": dj_database_url.parse(
+        "postgres://book_database_l6gv_user:Ct9m4OB0YV4LdYy8ilbCfPYzp1eFJrad@dpg-cp5fcp21hbls73fegjpg-a.oregon-postgres.render.com/book_database_l6gv"
+    )
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators

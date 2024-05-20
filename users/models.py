@@ -49,7 +49,7 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=255)
     date_joined = models.DateTimeField(default=timezone.now)
-
+    profile_image = models.ImageField(upload_to="media/profile_images/", blank=True)
     # specific fields for reader and author
     birth_date = models.DateField(blank=True, null=True)
     gender = models.CharField(max_length=55, choices=Gender, blank=True)
