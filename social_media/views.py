@@ -148,6 +148,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        post = Post.objects.filter(id=post_id).first()
+        post.add_comment()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, comment_id):
@@ -180,6 +182,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         UserView.check_auth(self, request)
         try:
             queryset = self.get_queryset().filter(id=comment_id).first()
+            queryset.post.remove_comment()
             queryset.delete()
             return Response("Comment Deleted")
         except:
@@ -245,6 +248,8 @@ class InnerCommentViewSet(viewsets.ModelViewSet):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        comment = Comment.objects.filter(id=comment_id).first()
+        comment.add_inner_comment()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, inner_comment_id):
@@ -279,6 +284,7 @@ class InnerCommentViewSet(viewsets.ModelViewSet):
         UserView.check_auth(self, request)
         try:
             queryset = self.get_queryset().filter(id=inner_comment_id).first()
+            queryset.comment.remove_inner_comment()
             queryset.delete()
             return Response("InnerComment Deleted")
         except:

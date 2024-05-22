@@ -16,7 +16,10 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = "__all__"
-        extra_kwargs = {"like_count": {"read_only": True}}
+        extra_kwargs = {
+            "like_count": {"read_only": True},
+            "inner_comment_count": {"read_only": True},
+        }
 
 
 class InnerCommentSerializer(serializers.ModelSerializer):

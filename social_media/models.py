@@ -50,6 +50,7 @@ class Comment(models.Model):
     content = models.TextField(max_length=1024)
     created_time = models.DateTimeField(auto_now_add=True)
     like_count = models.PositiveIntegerField(default=0)
+    inner_comment_count = models.PositiveIntegerField(default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
 
@@ -66,6 +67,15 @@ class Comment(models.Model):
     def remove_like(self):
         if self.like_count > 0:
             self.like_count -= 1
+            self.save()
+
+    def add_inner_comment(self):
+        self.inner_comment_count += 1
+        self.save()
+
+    def remove_inner_comment(self):
+        if self.inner_comment_count > 0:
+            self.inner_comment_count -= 1
             self.save()
 
 
