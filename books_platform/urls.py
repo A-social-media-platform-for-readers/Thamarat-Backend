@@ -57,7 +57,7 @@ urlpatterns = [
     path("auth/user/", UserView.as_view({"get": "retrieve"})),
     path(
         "auth/user/<int:pk>/",
-        UserViewSet.as_view({"get": "retrieve", "put": "update"}),
+        UserViewSet.as_view({"get": "retrieve", "put": "update", "delete": "destroy"}),
     ),
     # book end points
     # path("", include(BookRouter.urls)),

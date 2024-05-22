@@ -12,7 +12,6 @@ class RegisterView(viewsets.ModelViewSet):
     """
     Create a new user.
     """
-
     queryset = User.objects.none()
     serializer_class = UserSerializer
 
@@ -27,11 +26,13 @@ class LoginView(viewsets.ModelViewSet):
     """
     User Login
     """
-
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
     def login(self, request):
+        """
+        User Login
+        """
         email = request.data["email"]
         password = request.data["password"]
 
@@ -62,7 +63,6 @@ class UserView(viewsets.ModelViewSet):
     """
     Check Authentication and Retrieve User
     """
-
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -71,7 +71,6 @@ class UserView(viewsets.ModelViewSet):
         Check Authentication function is used for view apis by
         import it in views.py to secure our apis
         """
-
         token = request.headers.get("Authorization") or request.COOKIES.get("jwt")
 
         if not token:
@@ -88,7 +87,6 @@ class UserView(viewsets.ModelViewSet):
         """
         Retrieve User after checking authentication
         """
-
         payload = self.check_auth(request)
         user = self.get_queryset().filter(id=payload["id"]).first()
         serializer = self.serializer_class(user)
@@ -99,7 +97,6 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     User CRUD
     """
-
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -107,7 +104,6 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Retrieve user by id
         """
-
         UserView.check_auth(self, request)
         user = self.get_queryset().filter(id=pk).first()
         serializer = self.serializer_class(user)
@@ -117,24 +113,34 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Update User
         """
-
         UserView.check_auth(self, request)
         user = self.get_queryset().filter(id=pk).first()
         serializer = self.serializer_class(user, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    def destroy(self, request, pk):
+        """
+        Delete User
+        """
+        UserView.check_auth(self, request)
+        user = self.get_queryset().filter(id=pk).first()
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class LogoutView(viewsets.ModelViewSet):
     """
     Logout User
     """
-
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
     def logout(self, request):
+        """
+        User Logout
+        """
         response = Response()
         response.delete_cookie("jwt")
         response.data = {"message": "success"}
