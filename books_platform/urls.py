@@ -109,6 +109,7 @@ urlpatterns = [
         BookSummaryUdateDelete.as_view({"put": "update", "delete": "destroy"}),
     ),
     # social media end points
+    # Post end points
     path(
         "social-media/posts/",
         PostViewSet.as_view({"get": "list", "post": "create"}),
@@ -120,6 +121,36 @@ urlpatterns = [
     path(
         "social-media/posts/likes-counter/<int:pk>/",
         PostLikeViewSet.as_view({"post": "like", "delete": "unlike"}),
+    ),
+    # Comment end points
+    path(
+        "social-media/comments/<int:post_id>/",
+        CommentViewSet.as_view({"get": "list", "post": "create"}),
+    ),
+    path(
+        "social-media/comments/<int:comment_id>/",
+        CommentViewSet.as_view(
+            {"get": "retrieve", "put": "update", "delete": "destroy"}
+        ),
+    ),
+    path(
+        "social-media/comments/likes-counter/<int:comment_id>/",
+        CommentLikeViewSet.as_view({"post": "like", "delete": "unlike"}),
+    ),
+    # InnerComment end points
+    path(
+        "social-media/inner-comments/<int:comment_id>/",
+        InnerCommentViewSet.as_view({"get": "list", "post": "create"}),
+    ),
+    path(
+        "social-media/inner-comments/<int:inner_comment_id>/",
+        InnerCommentViewSet.as_view(
+            {"get": "retrieve", "put": "update", "delete": "destroy"}
+        ),
+    ),
+    path(
+        "social-media/inner-comments/likes-counter/<int:inner_comment_id>/",
+        InnerCommentLikeViewSet.as_view({"post": "like", "delete": "unlike"}),
     ),
 ]
 

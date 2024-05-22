@@ -1,12 +1,12 @@
 from rest_framework.response import Response
-from .serializers import PostSerializer
-from .models import Post
+from .serializers import PostSerializer, CommentSerializer, InnerCommentSerializer
+from .models import Post, Comment, InnerComment
 from rest_framework import viewsets, pagination
 from rest_framework import status
 from users.views import UserView
 
 
-class PostPagination(pagination.PageNumberPagination):
+class PaginationNumber(pagination.PageNumberPagination):
     """
     PaginatPostion class for Post objects.
 
@@ -27,13 +27,12 @@ class PostViewSet(viewsets.ModelViewSet):
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    pagination_class = PostPagination
+    pagination_class = PaginationNumber
 
     def list(self, request):
         """
         Retrieve all posts.
         """
-
         UserView.check_auth(self, request)
         queryset = self.get_queryset()
         page = self.paginate_queryset(queryset)
@@ -48,7 +47,6 @@ class PostViewSet(viewsets.ModelViewSet):
         """
         Create a new post.
         """
-
         UserView.check_auth(self, request)
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -59,7 +57,6 @@ class PostViewSet(viewsets.ModelViewSet):
         """
         Retrieve a post.
         """
-
         UserView.check_auth(self, request)
         try:
             queryset = self.get_queryset().filter(id=pk).first()
@@ -72,7 +69,6 @@ class PostViewSet(viewsets.ModelViewSet):
         """
         Update a post.
         """
-
         UserView.check_auth(self, request)
         post = self.get_queryset().filter(id=pk).first()
         serializer = self.serializer_class(post, data=request.data)
@@ -84,7 +80,6 @@ class PostViewSet(viewsets.ModelViewSet):
         """
         Delete a post.
         """
-
         UserView.check_auth(self, request)
         try:
             queryset = self.get_queryset().filter(id=pk).first()
@@ -106,7 +101,6 @@ class PostLikeViewSet(viewsets.ModelViewSet):
         """
         Like a post.
         """
-
         UserView.check_auth(self, request)
         post = self.get_queryset().filter(id=pk).first()
         post.like()
@@ -116,8 +110,205 @@ class PostLikeViewSet(viewsets.ModelViewSet):
         """
         Unlike a post.
         """
-
         UserView.check_auth(self, request)
         post = self.get_queryset().filter(id=pk).first()
         post.remove_like()
         return Response("Post Unliked", status=status.HTTP_201_CREATED)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    """
+    Comment viewset
+    """
+
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    pagination_class = PaginationNumber
+
+    def list(self, request, post_id):
+        """
+        Retrieve all comments.
+        """
+        UserView.check_auth(self, request)
+        post = Post.objects.filter(id=post_id).first()
+        queryset = self.get_queryset().filter(post=post)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request, post_id):
+        """
+        Create a new comment.
+        """
+        UserView.check_auth(self, request)
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def retrieve(self, request, comment_id):
+        """
+        Retrieve a comment.
+        """
+        UserView.check_auth(self, request)
+        try:
+            queryset = self.get_queryset().filter(id=comment_id).first()
+            serializer = self.serializer_class(queryset)
+            return Response(serializer.data)
+        except:
+            return Response("Comment Not Found", status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request, comment_id):
+        """
+        Update a comment.
+        """
+        UserView.check_auth(self, request)
+        comment = self.get_queryset().filter(id=comment_id).first()
+        serializer = self.serializer_class(comment, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, comment_id):
+        """
+        Delete a comment.
+        """
+        UserView.check_auth(self, request)
+        try:
+            queryset = self.get_queryset().filter(id=comment_id).first()
+            queryset.delete()
+            return Response("Comment Deleted")
+        except:
+            return Response("Comment Not Found", status=status.HTTP_400_BAD_REQUEST)
+
+
+class CommentLikeViewSet(viewsets.ModelViewSet):
+    """
+    Comment like counter
+    """
+
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    def like(self, request, comment_id):
+        """
+        Like a comment.
+        """
+        UserView.check_auth(self, request)
+        comment = self.get_queryset().filter(id=comment_id).first()
+        comment.like()
+        return Response("Comment Liked", status=status.HTTP_201_CREATED)
+
+    def unlike(self, request, comment_id):
+        """
+        Unlike a comment.
+        """
+        UserView.check_auth(self, request)
+        comment = self.get_queryset().filter(id=comment_id).first()
+        comment.remove_like()
+        return Response("Comment Unliked", status=status.HTTP_201_CREATED)
+
+
+class InnerCommentViewSet(viewsets.ModelViewSet):
+    """
+    InnerComment viewset
+    """
+
+    queryset = InnerComment.objects.all()
+    serializer_class = InnerCommentSerializer
+    pagination_class = PaginationNumber
+
+    def list(self, request, comment_id):
+        """
+        Retrieve all InnerComments.
+        """
+        UserView.check_auth(self, request)
+        comment = Comment.objects.filter(id=comment_id).first()
+        queryset = self.get_queryset().filter(comment=comment)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request, comment_id):
+        """
+        Create a new InnerComment.
+        """
+        UserView.check_auth(self, request)
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def retrieve(self, request, inner_comment_id):
+        """
+        Retrieve a InnerComment.
+        """
+        UserView.check_auth(self, request)
+        try:
+            queryset = self.get_queryset().filter(id=inner_comment_id).first()
+            serializer = self.serializer_class(queryset)
+            return Response(serializer.data)
+        except:
+            return Response(
+                "InnerComment Not Found", status=status.HTTP_400_BAD_REQUEST
+            )
+
+    def update(self, request, inner_comment_id):
+        """
+        Update a InnerComment.
+        """
+        UserView.check_auth(self, request)
+        inner_comment = self.get_queryset().filter(id=inner_comment_id).first()
+        serializer = self.serializer_class(inner_comment, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, inner_comment_id):
+        """
+        Delete a InnerComment.
+        """
+        UserView.check_auth(self, request)
+        try:
+            queryset = self.get_queryset().filter(id=inner_comment_id).first()
+            queryset.delete()
+            return Response("InnerComment Deleted")
+        except:
+            return Response(
+                "InnerComment Not Found", status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class InnerCommentLikeViewSet(viewsets.ModelViewSet):
+    """
+    InnerComment like counter
+    """
+
+    queryset = InnerComment.objects.all()
+    serializer_class = InnerCommentSerializer
+
+    def like(self, request, inner_comment_id):
+        """
+        Like a InnerComment.
+        """
+        UserView.check_auth(self, request)
+        inner_comment = self.get_queryset().filter(id=inner_comment_id).first()
+        inner_comment.like()
+        return Response("InnerComment Liked", status=status.HTTP_201_CREATED)
+
+    def unlike(self, request, inner_comment_id):
+        """
+        Unlike a InnerComment.
+        """
+        UserView.check_auth(self, request)
+        inner_comment = self.get_queryset().filter(id=inner_comment_id).first()
+        inner_comment.remove_like()
+        return Response("InnerComment Unliked", status=status.HTTP_201_CREATED)
