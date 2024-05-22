@@ -128,7 +128,7 @@ urlpatterns = [
         CommentViewSet.as_view({"get": "list", "post": "create"}),
     ),
     path(
-        "social-media/comments/<int:comment_id>/",
+        "social-media/comment/<int:comment_id>/",
         CommentViewSet.as_view(
             {"get": "retrieve", "put": "update", "delete": "destroy"}
         ),
@@ -143,7 +143,7 @@ urlpatterns = [
         InnerCommentViewSet.as_view({"get": "list", "post": "create"}),
     ),
     path(
-        "social-media/inner-comments/<int:inner_comment_id>/",
+        "social-media/inner-comment/<int:inner_comment_id>/",
         InnerCommentViewSet.as_view(
             {"get": "retrieve", "put": "update", "delete": "destroy"}
         ),
