@@ -96,6 +96,24 @@ class UserView(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+class LogoutView(viewsets.ModelViewSet):
+    """
+    Logout User
+    """
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def logout(self, request):
+        """
+        User Logout
+        """
+        response = Response()
+        response.delete_cookie("jwt")
+        response.data = {"message": "success"}
+        return response
+
+
 class UserViewSet(viewsets.ModelViewSet):
     """
     User CRUD
@@ -126,8 +144,15 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Update User
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
         user = self.get_queryset().filter(id=pk).first()
+        if user is not None:
+            if user_id != user.id:
+                return Response(
+                    "You are not authorized to update this data",
+                    status=status.HTTP_403_FORBIDDEN,
+                )
         serializer = self.serializer_class(user, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -137,28 +162,17 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Delete User
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
         user = self.get_queryset().filter(id=pk).first()
+        if user is not None:
+            if user_id != user.id:
+                return Response(
+                    "You are not authorized to delete this user",
+                    status=status.HTTP_403_FORBIDDEN,
+                )
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class LogoutView(viewsets.ModelViewSet):
-    """
-    Logout User
-    """
-
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-    def logout(self, request):
-        """
-        User Logout
-        """
-        response = Response()
-        response.delete_cookie("jwt")
-        response.data = {"message": "success"}
-        return response
 
 
 class FollowView(viewsets.ModelViewSet):

@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from .serializers import PostSerializer, CommentSerializer, InnerCommentSerializer
 from .models import Post, Comment, InnerComment
+from users.models import User
 from rest_framework import viewsets, pagination
 from rest_framework import status
 from users.views import UserView
@@ -69,8 +70,15 @@ class PostViewSet(viewsets.ModelViewSet):
         """
         Update a post.
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
         post = self.get_queryset().filter(id=pk).first()
+        if post is not None:
+            if user_id != post.user.id:
+                return Response(
+                    "You are not authorized to update this post",
+                    status=status.HTTP_403_FORBIDDEN,
+                )
         serializer = self.serializer_class(post, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -80,10 +88,17 @@ class PostViewSet(viewsets.ModelViewSet):
         """
         Delete a post.
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
         try:
-            queryset = self.get_queryset().filter(id=pk).first()
-            queryset.delete()
+            post = self.get_queryset().filter(id=pk).first()
+            if post is not None:
+                if user_id != post.user.id:
+                    return Response(
+                        "You are not authorized to delete this post",
+                        status=status.HTTP_403_FORBIDDEN,
+                    )
+            post.delete()
             return Response("Post Deleted")
         except:
             return Response("Post Not Found", status=status.HTTP_400_BAD_REQUEST)
@@ -168,8 +183,15 @@ class CommentViewSet(viewsets.ModelViewSet):
         """
         Update a comment.
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
         comment = self.get_queryset().filter(id=comment_id).first()
+        if comment is not None:
+            if user_id != comment.user.id:
+                return Response(
+                    "You are not authorized to update this comment",
+                    status=status.HTTP_403_FORBIDDEN,
+                )
         serializer = self.serializer_class(comment, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -179,11 +201,18 @@ class CommentViewSet(viewsets.ModelViewSet):
         """
         Delete a comment.
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
         try:
-            queryset = self.get_queryset().filter(id=comment_id).first()
-            queryset.post.remove_comment()
-            queryset.delete()
+            comment = self.get_queryset().filter(id=comment_id).first()
+            if comment is not None:
+                if user_id != comment.user.id:
+                    return Response(
+                        "You are not authorized to delete this comment",
+                        status=status.HTTP_403_FORBIDDEN,
+                    )
+            comment.post.remove_comment()
+            comment.delete()
             return Response("Comment Deleted")
         except:
             return Response("Comment Not Found", status=status.HTTP_400_BAD_REQUEST)
@@ -270,8 +299,15 @@ class InnerCommentViewSet(viewsets.ModelViewSet):
         """
         Update a InnerComment.
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
         inner_comment = self.get_queryset().filter(id=inner_comment_id).first()
+        if inner_comment is not None:
+            if user_id != inner_comment.user.id:
+                return Response(
+                    "You are not authorized to update this InnerComment",
+                    status=status.HTTP_403_FORBIDDEN,
+                )
         serializer = self.serializer_class(inner_comment, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -281,11 +317,18 @@ class InnerCommentViewSet(viewsets.ModelViewSet):
         """
         Delete a InnerComment.
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
         try:
-            queryset = self.get_queryset().filter(id=inner_comment_id).first()
-            queryset.comment.remove_inner_comment()
-            queryset.delete()
+            inner_comment = self.get_queryset().filter(id=inner_comment_id).first()
+            if inner_comment is not None:
+                if user_id != inner_comment.user.id:
+                    return Response(
+                        "You are not authorized to delete this InnerComment",
+                        status=status.HTTP_403_FORBIDDEN,
+                    )
+            inner_comment.comment.remove_inner_comment()
+            inner_comment.delete()
             return Response("InnerComment Deleted")
         except:
             return Response(
