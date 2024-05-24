@@ -50,7 +50,13 @@ class User(AbstractUser):
     password = models.CharField(max_length=255)
     date_joined = models.DateTimeField(default=timezone.now)
     profile_image = models.ImageField(upload_to="media/profile_images/", blank=True)
-
+    bio = models.TextField(blank=True)
+    followers = models.ManyToManyField(
+        "self", related_name="followed_by", symmetrical=False, blank=True
+    )
+    following = models.ManyToManyField(
+        "self", related_name="i_follow", symmetrical=False, blank=True
+    )
     # specific fields for reader and author
     birth_date = models.DateField(blank=True, null=True)
     gender = models.CharField(max_length=55, choices=Gender, blank=True)

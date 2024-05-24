@@ -55,10 +55,22 @@ urlpatterns = [
     path("auth/login/", LoginView.as_view({"post": "login"})),
     path("auth/logout/", LogoutView.as_view({"post": "logout"})),
     path("auth/user/", UserView.as_view({"get": "retrieve"})),
+    # User end points
+    path("users/", UserViewSet.as_view({"get": "list"})),
     path(
-        "auth/user/<int:pk>/",
+        "users/<int:pk>/",
         UserViewSet.as_view({"get": "retrieve", "put": "update", "delete": "destroy"}),
     ),
+    path(
+        "users/follow/<int:user_to_follow_id>/<int:user_to_followed_id>/",
+        FollowView.as_view({"post": "follow"}),
+    ),
+    path(
+        "users/unfollow/<int:user_to_unfollow_id>/<int:user_to_unfollowed_id>/",
+        FollowView.as_view({"delete": "unfollow"}),
+    ),
+    path("users/followers/<int:user_id>/", FollowView.as_view({"get": "followers"})),
+    path("users/following/<int:user_id>/", FollowView.as_view({"get": "following"})),
     # book end points
     # path("", include(BookRouter.urls)),
     path("books/", BookViewSet.as_view({"get": "list", "post": "create"})),
@@ -119,7 +131,7 @@ urlpatterns = [
         PostViewSet.as_view({"get": "retrieve", "put": "update", "delete": "destroy"}),
     ),
     path(
-        "social-media/posts/likes-counter/<int:pk>/",
+        "social-media/posts/<int:pk>/likes/",
         PostLikeViewSet.as_view({"post": "like", "delete": "unlike"}),
     ),
     # Comment end points
@@ -134,7 +146,7 @@ urlpatterns = [
         ),
     ),
     path(
-        "social-media/comments/likes-counter/<int:comment_id>/",
+        "social-media/comments/<int:comment_id>/likes/",
         CommentLikeViewSet.as_view({"post": "like", "delete": "unlike"}),
     ),
     # InnerComment end points
@@ -149,7 +161,7 @@ urlpatterns = [
         ),
     ),
     path(
-        "social-media/inner-comments/likes-counter/<int:inner_comment_id>/",
+        "social-media/inner-comments/<int:inner_comment_id>/likes/",
         InnerCommentLikeViewSet.as_view({"post": "like", "delete": "unlike"}),
     ),
 ]

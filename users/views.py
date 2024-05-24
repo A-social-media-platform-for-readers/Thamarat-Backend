@@ -12,6 +12,7 @@ class RegisterView(viewsets.ModelViewSet):
     """
     Create a new user.
     """
+
     queryset = User.objects.none()
     serializer_class = UserSerializer
 
@@ -26,6 +27,7 @@ class LoginView(viewsets.ModelViewSet):
     """
     User Login
     """
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -63,6 +65,7 @@ class UserView(viewsets.ModelViewSet):
     """
     Check Authentication and Retrieve User
     """
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -97,8 +100,18 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     User CRUD
     """
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def list(self, request):
+        """
+        List Users
+        """
+        UserView.check_auth(self, request)
+        user = self.get_queryset()
+        serializer = self.serializer_class(user, many=True)
+        return Response(serializer.data)
 
     def retrieve(self, request, pk):
         """
@@ -108,7 +121,7 @@ class UserViewSet(viewsets.ModelViewSet):
         user = self.get_queryset().filter(id=pk).first()
         serializer = self.serializer_class(user)
         return Response(serializer.data)
-    
+
     def update(self, request, pk):
         """
         Update User
@@ -119,7 +132,7 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
+
     def destroy(self, request, pk):
         """
         Delete User
@@ -134,6 +147,7 @@ class LogoutView(viewsets.ModelViewSet):
     """
     Logout User
     """
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -145,3 +159,60 @@ class LogoutView(viewsets.ModelViewSet):
         response.delete_cookie("jwt")
         response.data = {"message": "success"}
         return response
+
+
+class FollowView(viewsets.ModelViewSet):
+    """
+    Follow User
+    """
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def follow(self, request, user_to_follow_id, user_to_followed_id):
+        """
+        Follow User
+        """
+        UserView.check_auth(self, request)
+        user_to_follow = self.get_queryset().filter(id=user_to_follow_id).first()
+        user_to_followed = self.get_queryset().filter(id=user_to_followed_id).first()
+        user_to_follow.following.add(user_to_followed)
+        user_to_follow.save()
+        user_to_followed.followers.add(user_to_follow)
+        user_to_followed.save()
+        return Response({"message": "success"})
+
+    def unfollow(self, request, user_to_unfollow_id, user_to_unfollowed_id):
+        """
+        Unfollow User
+        """
+        UserView.check_auth(self, request)
+        user_to_unfollow = self.get_queryset().filter(id=user_to_unfollow_id).first()
+        user_to_unfollowed = (
+            self.get_queryset().filter(id=user_to_unfollowed_id).first()
+        )
+        user_to_unfollow.following.remove(user_to_unfollowed)
+        user_to_unfollow.save()
+        user_to_unfollowed.followers.remove(user_to_unfollow)
+        user_to_unfollowed.save()
+        return Response({"message": "success"})
+
+    def followers(self, request, user_id):
+        """
+        Get Followers
+        """
+        UserView.check_auth(self, request)
+        user = self.get_queryset().filter(id=user_id).first()
+        follower = user.followers
+        serializer = self.serializer_class(follower, many=True)
+        return Response(serializer.data)
+
+    def following(self, request, user_id):
+        """
+        Get Following
+        """
+        UserView.check_auth(self, request)
+        user = self.get_queryset().filter(id=user_id).first()
+        follower = user.following
+        serializer = self.serializer_class(follower, many=True)
+        return Response(serializer.data)
