@@ -183,11 +183,12 @@ class FollowView(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    def follow(self, request, user_to_follow_id, user_to_followed_id):
+    def follow(self, request, user_to_followed_id):
         """
         Follow User
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_to_follow_id = payload["id"]
         user_to_follow = self.get_queryset().filter(id=user_to_follow_id).first()
         user_to_followed = self.get_queryset().filter(id=user_to_followed_id).first()
         user_to_follow.following.add(user_to_followed)
@@ -196,11 +197,12 @@ class FollowView(viewsets.ModelViewSet):
         user_to_followed.save()
         return Response({"message": "success"})
 
-    def unfollow(self, request, user_to_unfollow_id, user_to_unfollowed_id):
+    def unfollow(self, request, user_to_unfollowed_id):
         """
         Unfollow User
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_to_unfollow_id = payload["id"]
         user_to_unfollow = self.get_queryset().filter(id=user_to_unfollow_id).first()
         user_to_unfollowed = (
             self.get_queryset().filter(id=user_to_unfollowed_id).first()
@@ -213,7 +215,7 @@ class FollowView(viewsets.ModelViewSet):
 
     def followers(self, request, user_id):
         """
-        Get Followers
+        Get My Followers
         """
         UserView.check_auth(self, request)
         user = self.get_queryset().filter(id=user_id).first()
@@ -223,7 +225,7 @@ class FollowView(viewsets.ModelViewSet):
 
     def following(self, request, user_id):
         """
-        Get Following
+        Get Users Who I Follow
         """
         UserView.check_auth(self, request)
         user = self.get_queryset().filter(id=user_id).first()

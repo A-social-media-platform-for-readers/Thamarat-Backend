@@ -62,11 +62,11 @@ urlpatterns = [
         UserViewSet.as_view({"get": "retrieve", "put": "update", "delete": "destroy"}),
     ),
     path(
-        "users/follow/<int:user_to_follow_id>/<int:user_to_followed_id>/",
+        "users/follow/<int:user_to_followed_id>/",
         FollowView.as_view({"post": "follow"}),
     ),
     path(
-        "users/unfollow/<int:user_to_unfollow_id>/<int:user_to_unfollowed_id>/",
+        "users/unfollow/<int:user_to_unfollowed_id>/",
         FollowView.as_view({"delete": "unfollow"}),
     ),
     path("users/followers/<int:user_id>/", FollowView.as_view({"get": "followers"})),

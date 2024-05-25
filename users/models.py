@@ -2,10 +2,6 @@ from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-# class AccountStatus(models.TextChoices):
-#     ACTIVE = "ACTIVE"
-#     INACTIVE = "INACTIVE"
-
 
 class Gender(models.TextChoices):
     """
