@@ -4,7 +4,7 @@ from .models import User
 
 class UserSerializer(serializers.ModelSerializer):
     """
-    Serializer for User model
+    Serializer for User model.
     """
 
     followers = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
@@ -26,16 +26,18 @@ class UserSerializer(serializers.ModelSerializer):
             "gender",
             "phone",
             "address",
+            "our_books",
         ]
         extra_kwargs = {
             "password": {"write_only": True},
             "followers": {"read_only": True},
             "following": {"read_only": True},
+            "our_books": {"read_only": True},
         }
 
     def create(self, validated_data):
         """
-        Encrypt password
+        Encrypt password.
         """
         password = validated_data.pop("password", None)
         instance = self.Meta.model(**validated_data)

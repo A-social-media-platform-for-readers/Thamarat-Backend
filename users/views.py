@@ -25,7 +25,7 @@ class RegisterView(viewsets.ModelViewSet):
 
 class LoginView(viewsets.ModelViewSet):
     """
-    User Login
+    User Login.
     """
 
     queryset = User.objects.all()
@@ -33,7 +33,10 @@ class LoginView(viewsets.ModelViewSet):
 
     def login(self, request):
         """
-        User Login
+        User Login.
+
+        Returns:
+            {"jwt": token} in json format and in cookie.
         """
         email = request.data["email"]
         password = request.data["password"]
@@ -63,7 +66,7 @@ class LoginView(viewsets.ModelViewSet):
 
 class UserView(viewsets.ModelViewSet):
     """
-    Check Authentication and Retrieve User
+    Check Authentication and Retrieve User.
     """
 
     queryset = User.objects.all()
@@ -72,7 +75,7 @@ class UserView(viewsets.ModelViewSet):
     def check_auth(self, request):
         """
         Check Authentication function is used for view apis by
-        import it in views.py to secure our apis
+        import it in views.py to secure our apis.
         """
         token = request.headers.get("Authorization") or request.COOKIES.get("jwt")
 
@@ -88,7 +91,7 @@ class UserView(viewsets.ModelViewSet):
 
     def retrieve(self, request):
         """
-        Retrieve User after checking authentication
+        Retrieve Login User data after checking authentication.
         """
         payload = self.check_auth(request)
         user = self.get_queryset().filter(id=payload["id"]).first()
@@ -98,7 +101,7 @@ class UserView(viewsets.ModelViewSet):
 
 class LogoutView(viewsets.ModelViewSet):
     """
-    Logout User
+    User Logout and Delete Cookie.
     """
 
     queryset = User.objects.all()
@@ -106,7 +109,9 @@ class LogoutView(viewsets.ModelViewSet):
 
     def logout(self, request):
         """
-        User Logout
+        User Logout and Delete Cookie.
+
+        Note: request body is not required.
         """
         response = Response()
         response.delete_cookie("jwt")
@@ -124,7 +129,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         """
-        List Users
+        List Users.
         """
         UserView.check_auth(self, request)
         user = self.get_queryset()
@@ -133,7 +138,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, pk):
         """
-        Retrieve user by id
+        Retrieve user by id.
         """
         UserView.check_auth(self, request)
         user = self.get_queryset().filter(id=pk).first()
@@ -142,7 +147,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk):
         """
-        Update User
+        Update User.
         """
         payload = UserView.check_auth(self, request)
         user_id = payload["id"]
@@ -160,7 +165,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, pk):
         """
-        Delete User
+        Delete User.
         """
         payload = UserView.check_auth(self, request)
         user_id = payload["id"]
@@ -177,7 +182,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class FollowView(viewsets.ModelViewSet):
     """
-    Follow User
+    Follow User.
     """
 
     queryset = User.objects.all()
@@ -186,6 +191,8 @@ class FollowView(viewsets.ModelViewSet):
     def follow(self, request, user_to_followed_id):
         """
         Follow User
+
+        Note: request body is not required.
         """
         payload = UserView.check_auth(self, request)
         user_to_follow_id = payload["id"]
@@ -199,7 +206,7 @@ class FollowView(viewsets.ModelViewSet):
 
     def unfollow(self, request, user_to_unfollowed_id):
         """
-        Unfollow User
+        Unfollow User.
         """
         payload = UserView.check_auth(self, request)
         user_to_unfollow_id = payload["id"]
@@ -215,7 +222,7 @@ class FollowView(viewsets.ModelViewSet):
 
     def followers(self, request, user_id):
         """
-        Get My Followers
+        Get My Followers.
         """
         UserView.check_auth(self, request)
         user = self.get_queryset().filter(id=user_id).first()
@@ -225,7 +232,7 @@ class FollowView(viewsets.ModelViewSet):
 
     def following(self, request, user_id):
         """
-        Get Users Who I Follow
+        Get Users Who I Follow.
         """
         UserView.check_auth(self, request)
         user = self.get_queryset().filter(id=user_id).first()

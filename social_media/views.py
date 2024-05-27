@@ -32,7 +32,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         """
-        Retrieve all posts.
+        List posts by pagination pages(5 by 5).
         """
         UserView.check_auth(self, request)
         queryset = self.get_queryset()
@@ -106,7 +106,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
 class PostLikeViewSet(viewsets.ModelViewSet):
     """
-    Post like counter
+    Post like counter.
     """
 
     queryset = Post.objects.all()
@@ -114,7 +114,9 @@ class PostLikeViewSet(viewsets.ModelViewSet):
 
     def like(self, request, pk):
         """
-        Like a post.
+        Like a Post(add one to likes count).
+
+        Note: request body is not required.
         """
         UserView.check_auth(self, request)
         post = self.get_queryset().filter(id=pk).first()
@@ -123,7 +125,7 @@ class PostLikeViewSet(viewsets.ModelViewSet):
 
     def unlike(self, request, pk):
         """
-        Unlike a post.
+        Unlike a Post(subtract one form likes count).
         """
         UserView.check_auth(self, request)
         post = self.get_queryset().filter(id=pk).first()
@@ -133,7 +135,7 @@ class PostLikeViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     """
-    Comment viewset
+    Comment viewset.
     """
 
     queryset = Comment.objects.all()
@@ -142,7 +144,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def list(self, request, post_id):
         """
-        Retrieve all comments.
+        List comments by pagination pages(5 by 5).
         """
         UserView.check_auth(self, request)
         post = Post.objects.filter(id=post_id).first()
@@ -228,7 +230,9 @@ class CommentLikeViewSet(viewsets.ModelViewSet):
 
     def like(self, request, comment_id):
         """
-        Like a comment.
+        Like a Comment(add one to likes count).
+
+        Note: request body is not required.
         """
         UserView.check_auth(self, request)
         comment = self.get_queryset().filter(id=comment_id).first()
@@ -237,7 +241,7 @@ class CommentLikeViewSet(viewsets.ModelViewSet):
 
     def unlike(self, request, comment_id):
         """
-        Unlike a comment.
+        Unlike a Comment(subtract one form likes count).
         """
         UserView.check_auth(self, request)
         comment = self.get_queryset().filter(id=comment_id).first()
@@ -247,7 +251,7 @@ class CommentLikeViewSet(viewsets.ModelViewSet):
 
 class InnerCommentViewSet(viewsets.ModelViewSet):
     """
-    InnerComment viewset
+    InnerComment viewset.
     """
 
     queryset = InnerComment.objects.all()
@@ -256,7 +260,7 @@ class InnerCommentViewSet(viewsets.ModelViewSet):
 
     def list(self, request, comment_id):
         """
-        Retrieve all InnerComments.
+        List Inner Comments by pagination pages(5 by 5).
         """
         UserView.check_auth(self, request)
         comment = Comment.objects.filter(id=comment_id).first()
@@ -338,7 +342,7 @@ class InnerCommentViewSet(viewsets.ModelViewSet):
 
 class InnerCommentLikeViewSet(viewsets.ModelViewSet):
     """
-    InnerComment like counter
+    InnerComment like counter.
     """
 
     queryset = InnerComment.objects.all()
@@ -346,7 +350,9 @@ class InnerCommentLikeViewSet(viewsets.ModelViewSet):
 
     def like(self, request, inner_comment_id):
         """
-        Like a InnerComment.
+        Like a InnerComment(add one to likes count).
+
+        Note: request body is not required.
         """
         UserView.check_auth(self, request)
         inner_comment = self.get_queryset().filter(id=inner_comment_id).first()
@@ -355,7 +361,7 @@ class InnerCommentLikeViewSet(viewsets.ModelViewSet):
 
     def unlike(self, request, inner_comment_id):
         """
-        Unlike a InnerComment.
+        Unlike a InnerComment(subtract one form likes count).
         """
         UserView.check_auth(self, request)
         inner_comment = self.get_queryset().filter(id=inner_comment_id).first()

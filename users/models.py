@@ -1,6 +1,7 @@
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from books.models import Book
 
 
 class Gender(models.TextChoices):
@@ -14,7 +15,7 @@ class Gender(models.TextChoices):
 
 class Identity(models.TextChoices):
     """
-    Identity choices for user
+    Identity choices for user.
     """
 
     READER = "READER"
@@ -24,7 +25,7 @@ class Identity(models.TextChoices):
 
 class Address(models.Model):
     """
-    Address model for user
+    Address model for user.
     """
 
     id = models.AutoField(primary_key=True)
@@ -36,7 +37,7 @@ class Address(models.Model):
 
 class User(AbstractUser):
     """
-    User override model for authentication
+    User override model for authentication.
     """
 
     id = models.AutoField(primary_key=True)
@@ -62,7 +63,7 @@ class User(AbstractUser):
     address = models.OneToOneField(
         Address, on_delete=models.CASCADE, blank=True, null=True
     )
-
+    our_books = models.ManyToManyField(Book, related_name="books", blank=True)
     # django depend on username in authentication process but
     # we want to depend on email in authentication process
     # because email is unique field

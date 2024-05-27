@@ -3,6 +3,10 @@ from .models import Post, Comment, InnerComment
 
 
 class PostSerializer(serializers.ModelSerializer):
+    """
+    Post Serializer.
+    """
+
     class Meta:
         model = Post
         fields = "__all__"
@@ -13,6 +17,10 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    """
+    Comment Serializer.
+    """
+
     class Meta:
         model = Comment
         fields = "__all__"
@@ -23,6 +31,10 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class InnerCommentSerializer(serializers.ModelSerializer):
+    """
+    InnerComment Serializer.
+    """
+
     class Meta:
         model = InnerComment
         fields = "__all__"

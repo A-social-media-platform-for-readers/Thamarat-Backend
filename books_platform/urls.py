@@ -29,9 +29,25 @@ from users.views import *
 from books.views import *
 from social_media.views import *
 
+from django.urls import converters
+from django.urls import register_converter
+
+
+class FloatUrlParameterConverter:
+    """Custom converter to ensure float type"""
+
+    regex = r"[0-9]+\.?[0-9]*"  # Match any float or integer number
+
+    def to_python(self, value):
+        try:
+            return float(value)
+        except ValueError:
+            raise converters(value, message="Invalid float parameter")
+
+
+register_converter(FloatUrlParameterConverter, "float&integer")
+
 # from rest_framework.routers import DefaultRouter
-
-
 # BookRouter = DefaultRouter()
 # BookRouter.register(r"books", BookViewSet)
 
@@ -73,6 +89,7 @@ urlpatterns = [
     path("users/following/<int:user_id>/", FollowView.as_view({"get": "following"})),
     # book end points
     # path("", include(BookRouter.urls)),
+    path("books/6", BookViewSet6.as_view({"get": "list"})),
     path("books/", BookViewSet.as_view({"get": "list", "post": "create"})),
     path(
         "books/<int:pk>/",
@@ -85,7 +102,48 @@ urlpatterns = [
             }
         ),
     ),
-    path("books/review/<int:pk>/", BookReview.as_view({"get": "retrieve"})),
+    path(
+        "books/rate/<int:book_id>/<float&integer:rating>/",
+        BookRate.as_view({"post": "rate"}),
+    ),
+    path(
+        "books/readed/<int:book_id>/",
+        WantToRead.as_view({"post": "readed"}),
+    ),
+    path(
+        "books/reading/<int:book_id>/",
+        WantToRead.as_view({"post": "reading"}),
+    ),
+    path(
+        "books/to-read/<int:book_id>/",
+        WantToRead.as_view({"post": "want_to_read"}),
+    ),
+    path(
+        "books/readed/",
+        WantToRead.as_view({"get": "get_readed_books"}),
+    ),
+    path(
+        "books/reading/",
+        WantToRead.as_view({"get": "get_reading_books"}),
+    ),
+    path(
+        "books/to-read/",
+        WantToRead.as_view({"get": "get_to_read_books"}),
+    ),
+    path(
+        "books/reviews/<int:book_id>/",
+        BookReviewView.as_view({"get": "list", "post": "create"}),
+    ),
+    path(
+        "books/review/<int:Review_id>/",
+        BookReviewView.as_view(
+            {"get": "retrieve", "put": "update", "delete": "destroy"}
+        ),
+    ),
+    path(
+        "books/review/<int:Review_id>/likes/",
+        BookReviewLikes.as_view({"post": "like", "delete": "unlike"}),
+    ),
     path("books/search/<str:string>/", BookSearch.as_view({"get": "list"})),
     path(
         "books/filter-genre/<str:genre>/",
@@ -117,7 +175,7 @@ urlpatterns = [
         BookSummaryList.as_view({"get": "list"}),
     ),
     path(
-        "books-summary/<int:book_id>/<int:summary_id>/",
+        "books-summary/<int:summary_id>/",
         BookSummaryUdateDelete.as_view({"put": "update", "delete": "destroy"}),
     ),
     # social media end points
@@ -136,32 +194,32 @@ urlpatterns = [
     ),
     # Comment end points
     path(
-        "social-media/comments/<int:post_id>/",
+        "social-media/posts/comments/<int:post_id>/",
         CommentViewSet.as_view({"get": "list", "post": "create"}),
     ),
     path(
-        "social-media/comment/<int:comment_id>/",
+        "social-media/posts/comment/<int:comment_id>/",
         CommentViewSet.as_view(
             {"get": "retrieve", "put": "update", "delete": "destroy"}
         ),
     ),
     path(
-        "social-media/comments/<int:comment_id>/likes/",
+        "social-media/posts/comments/<int:comment_id>/likes/",
         CommentLikeViewSet.as_view({"post": "like", "delete": "unlike"}),
     ),
     # InnerComment end points
     path(
-        "social-media/inner-comments/<int:comment_id>/",
+        "social-media/posts/comments/inner-comments/<int:comment_id>/",
         InnerCommentViewSet.as_view({"get": "list", "post": "create"}),
     ),
     path(
-        "social-media/inner-comment/<int:inner_comment_id>/",
+        "social-media/posts/comments/inner-comment/<int:inner_comment_id>/",
         InnerCommentViewSet.as_view(
             {"get": "retrieve", "put": "update", "delete": "destroy"}
         ),
     ),
     path(
-        "social-media/inner-comments/<int:inner_comment_id>/likes/",
+        "social-media/posts/comments/inner-comments/<int:inner_comment_id>/likes/",
         InnerCommentLikeViewSet.as_view({"post": "like", "delete": "unlike"}),
     ),
 ]
