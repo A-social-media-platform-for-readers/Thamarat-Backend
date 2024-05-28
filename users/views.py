@@ -5,7 +5,7 @@ from .serializers import UserSerializer
 from .models import User
 import jwt, datetime
 from rest_framework import status
-from rest_framework import viewsets
+from rest_framework import viewsets, pagination
 
 
 class RegisterView(viewsets.ModelViewSet):
@@ -238,4 +238,49 @@ class FollowView(viewsets.ModelViewSet):
         user = self.get_queryset().filter(id=user_id).first()
         follower = user.following
         serializer = self.serializer_class(follower, many=True)
+        return Response(serializer.data)
+
+
+class UserPagination(pagination.PageNumberPagination):
+    """
+    Pagination class for User objects.
+
+    This class defines the page size for paginated responses.
+
+    Attributes:
+        page_size (int): The number of users to display per page.
+            Default is 10.
+    """
+
+    page_size = 10
+
+
+class UserSearch(viewsets.ModelViewSet):
+    """
+    Search Users and list them by pagination pages.
+    """
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    pagination_class = UserPagination
+
+    def list(self, request, string):
+        """
+        Search users and list them by pagination pages(10 by 10).
+
+        Note: the input string search can be near from the actual string.
+        """
+
+        UserView.check_auth(self, request)
+        queryset = (
+            self.get_queryset().filter(name__icontains=string)
+            | self.get_queryset().filter(name__trigram_similar=string)
+            | self.get_queryset().filter(name__unaccent=string)
+        )
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)

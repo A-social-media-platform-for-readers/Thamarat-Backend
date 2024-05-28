@@ -87,6 +87,7 @@ urlpatterns = [
     ),
     path("users/followers/<int:user_id>/", FollowView.as_view({"get": "followers"})),
     path("users/following/<int:user_id>/", FollowView.as_view({"get": "following"})),
+    path("users/search/<str:string>/", UserSearch.as_view({"get": "list"})),
     # book end points
     # path("", include(BookRouter.urls)),
     path("books/6", BookViewSet6.as_view({"get": "list"})),

@@ -87,7 +87,7 @@ class Comment(models.Model):
         Default ordering by latest posts first.
         """
 
-        ordering = ["-creat_time"]
+        ordering = ["-created_time"]
 
     def __str__(self):
         """
@@ -147,7 +147,7 @@ class InnerComment(models.Model):
         Default ordering by latest posts first.
         """
 
-        ordering = ["-creat_time"]
+        ordering = ["-created_time"]
 
     def __str__(self):
         """
