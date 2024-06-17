@@ -114,14 +114,14 @@ class BookViewSet(viewsets.ModelViewSet):
         """
         Create new book.
         """
-        # payload = UserView.check_auth(self, request)
-        # user_id = payload["id"]
-        # user = User.objects.get(id=user_id)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        user = User.objects.get(id=user_id)
         book = self.serializer_class(data=request.data)
         book.is_valid(raise_exception=True)
         book.save()
-        # user.our_books.add(book.data["id"])
-        # user.save()
+        user.our_books.add(book.data["id"])
+        user.save()
         return Response(book.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk):
