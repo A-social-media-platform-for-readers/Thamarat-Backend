@@ -25,6 +25,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from django.urls import path, include
 
+from AI.views import *
 from users.views import *
 from books.views import *
 from social_media.views import *
@@ -88,6 +89,8 @@ urlpatterns = [
     path("users/followers/<int:user_id>/", FollowView.as_view({"get": "followers"})),
     path("users/following/<int:user_id>/", FollowView.as_view({"get": "following"})),
     path("users/search/<str:string>/", UserSearch.as_view({"get": "list"})),
+    # AI end points
+    path("AI/OCR/<str:pdf_path>/<str:language>/<int:pages_count>/", OCR.as_view({"post": "pdf2text"})),
     # book end points
     # path("", include(BookRouter.urls)),
     path("books/6", BookViewSet6.as_view({"get": "list"})),
