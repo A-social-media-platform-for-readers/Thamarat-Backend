@@ -176,7 +176,7 @@ class BookRate(viewsets.ModelViewSet):
         """
         Book rate.
 
-        Args:
+        Parameters:
             book_id (int): book id to rate it.
             rating (float): accept float or integer numbers.
         """
@@ -416,7 +416,8 @@ class BookFilterGenre(viewsets.ModelViewSet):
         """
         Filter books by genre.
 
-        Retreive the books by pagination pages(4 by 4).
+        Return:
+            the books by pagination pages(4 by 4).
         """
         UserView.check_auth(self, request)
         try:
@@ -448,14 +449,15 @@ class BookFilterGenreAndPrice(viewsets.ModelViewSet):
         Filter books by genre and price range,
         with the option to order by price in ascending or descending order.
 
-        Args:
+        Parameters:
             genre (str): The genre of the books.
             min_value (int): The minimum price of the books.
             max_value (int): The maximum price of the books.
             order_from (str): The order in which to sort the books, "DESC" for
                 descending order, any string else for ascending order.
 
-        Retreive the books by pagination pages(4 by 4).
+        Return:
+            the books by pagination pages(4 by 4)
         """
         UserView.check_auth(self, request)
         try:
