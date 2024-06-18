@@ -34,12 +34,12 @@ class OCR(viewsets.ModelViewSet):
     OCR API
     """
 
-    def pdf2text(self, request, pdf_path, language="eng", pages_count=1):
+    def pdf2text(self, request, book_title, language="eng", pages_count=1):
         """
         Convert pdf to text
 
         Parameters:
-			pdf_path (str): the path of the PDF file.
+			book_title (str): the title of the book.
 			language (str): the language of the PDF(eg: "eng" or "ara").
 			pages_count (int): the number of pages to be converted to text.
 
@@ -92,6 +92,6 @@ class OCR(viewsets.ModelViewSet):
 
             return final_text
 
-        Text = get_text_from_any_pdf(pdf_path)
+        Text = get_text_from_any_pdf("media/pdf_files/" + book_title + ".pdf")
 
         return Response(Text, status=status.HTTP_200_OK)
