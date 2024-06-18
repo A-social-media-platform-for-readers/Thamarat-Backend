@@ -3,6 +3,28 @@ from rest_framework import status
 from rest_framework.response import Response
 from pdf2image import convert_from_path
 from pytesseract import image_to_string
+from deep_translator import GoogleTranslator
+
+
+class Translate(viewsets.ModelViewSet):
+    """
+    Translation API
+    """
+
+    def translate(self, request, text, language="en"):
+        """
+        Translate text
+
+        Parameters:
+            text (str): the text to be translated.
+            language (str): the destination language(eg: "en" or "ar").
+
+        Return:
+            translated text.
+        """
+        translated = GoogleTranslator(source='auto', target=language).translate(text)
+        
+        return Response(translated, status=status.HTTP_200_OK)
 
 
 class OCR(viewsets.ModelViewSet):
