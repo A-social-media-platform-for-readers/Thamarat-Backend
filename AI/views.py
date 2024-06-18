@@ -67,7 +67,6 @@ class OCR(viewsets.ModelViewSet):
 
             return final_text
 
-        # Text = get_text_from_any_pdf(pdf_path)
-        Text = get_text_from_any_pdf('./media/pdf_files/hesn_almoslem2.pdf')
+        Text = get_text_from_any_pdf(pdf_path)
 
         return Response(Text, status=status.HTTP_200_OK)
