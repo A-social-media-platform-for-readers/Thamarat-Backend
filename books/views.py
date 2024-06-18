@@ -1,6 +1,8 @@
 from rest_framework import viewsets, pagination
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
+from django.http import FileResponse, HttpResponseNotFound
 from users.models import User
 from users.views import UserView
 from .serializers import (
@@ -162,6 +164,24 @@ class BookViewSet(viewsets.ModelViewSet):
             return Response("Book Deleted")
         except:
             return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)
+
+
+class BookDownload(viewsets.ModelViewSet):
+    """Download book pdf"""
+
+    def download_book_pdf(self, request, book_id):
+        """Download book pdf"""
+        UserView.check_auth(self, request)
+        book = get_object_or_404(Book, id=book_id)
+        if book.pdf_file:
+            response = FileResponse(
+                book.pdf_file.open("rb"),
+                as_attachment=False,
+                filename=book.pdf_file.name,
+            )
+            return response
+        else:
+            return HttpResponseNotFound("The requested book does not have a PDF file.")
 
 
 class BookRate(viewsets.ModelViewSet):
