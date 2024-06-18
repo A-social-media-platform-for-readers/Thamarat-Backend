@@ -90,8 +90,14 @@ urlpatterns = [
     path("users/following/<int:user_id>/", FollowView.as_view({"get": "following"})),
     path("users/search/<str:string>/", UserSearch.as_view({"get": "list"})),
     # AI end points
-    path("AI/OCR/<str:book_title>/<str:language>/<int:pages_count>/", OCR.as_view({"post": "pdf2text"})),
-    path("AI/translation/<str:text>/<str:language>/", Translate.as_view({"post": "translate"})),
+    path(
+        "AI/OCR/<str:book_title>/<str:language>/<int:pages_count>/",
+        OCR.as_view({"post": "pdf2text"}),
+    ),
+    path(
+        "AI/translation/<str:text>/<str:language>/",
+        Translate.as_view({"post": "translate"}),
+    ),
     # book end points
     # path("", include(BookRouter.urls)),
     path("books/6", BookViewSet6.as_view({"get": "list"})),
@@ -107,7 +113,10 @@ urlpatterns = [
             }
         ),
     ),
-    path('books/<int:book_id>/download/', BookDownload.as_view({"get": "download_book_pdf"})),
+    path(
+        "books/<int:book_id>/download/",
+        BookDownload.as_view({"get": "download_book_pdf"}),
+    ),
     path(
         "books/rate/<int:book_id>/<float&integer:rating>/",
         BookRate.as_view({"post": "rate"}),
