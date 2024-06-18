@@ -91,7 +91,7 @@ urlpatterns = [
     path("users/search/<str:string>/", UserSearch.as_view({"get": "list"})),
     # AI end points
     path("AI/OCR/<str:pdf_path>/<str:language>/<int:pages_count>/", OCR.as_view({"post": "pdf2text"})),
-    path("AI/translations/<str:text>/<str:language>/", Translate.as_view({"post": "translate"})),
+    path("AI/translation/<str:text>/<str:language>/", Translate.as_view({"post": "translate"})),
     # book end points
     # path("", include(BookRouter.urls)),
     path("books/6", BookViewSet6.as_view({"get": "list"})),
