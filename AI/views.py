@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.response import Response
+from users.views import UserView
 from pdf2image import convert_from_path
 from pytesseract import image_to_string
 from deep_translator import GoogleTranslator
@@ -22,6 +23,7 @@ class Translate(viewsets.ModelViewSet):
         Return:
             translated text.
         """
+        UserView.check_auth(self, request)
         translated = GoogleTranslator(source='auto', target=language).translate(text)
         
         return Response(translated, status=status.HTTP_200_OK)
@@ -45,6 +47,7 @@ class OCR(viewsets.ModelViewSet):
 			the textual content of all the pages.
 		"""
 
+        UserView.check_auth(self, request)
         def convert_pdf_to_img(pdf_file):
             """
             this function converts a PDF into Image
