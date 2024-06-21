@@ -1,7 +1,10 @@
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.response import Response
+from django.http import HttpResponseNotFound
+from django.shortcuts import get_object_or_404
 from users.views import UserView
+from books.models import Book
 from pdf2image import convert_from_path
 from pytesseract import image_to_string
 from deep_translator import GoogleTranslator
@@ -34,14 +37,15 @@ class OCR(viewsets.ModelViewSet):
     OCR API
     """
 
-    def pdf2text(self, request, book_title, language="eng", pages_count=1):
+    def pdf2text(self, request, book_id, start_page=0, end_page=1, language="eng"):
         """
         Convert pdf to text
 
         Parameters:
-			book_title (str): the title of the book.
+			book_id (int): the id of the book.
+			start_page (int): the number of page to start with(eg: 13).
+			end_page (int): the number of page to end with(eg: 15).
 			language (str): the language of the PDF(eg: "eng" or "ara").
-			pages_count (int): the number of pages to be converted to text.
 
 		Return:
 			the textual content of all the pages.
@@ -58,7 +62,7 @@ class OCR(viewsets.ModelViewSet):
             Return:
                 an interable containing image format of all the pages of the PDF
             """
-            return convert_from_path(pdf_file, first_page=0, last_page=pages_count)
+            return convert_from_path(pdf_file, first_page=start_page, last_page=end_page)
 
         def convert_image_to_text(file):
             """
@@ -92,6 +96,11 @@ class OCR(viewsets.ModelViewSet):
 
             return final_text
 
-        Text = get_text_from_any_pdf("media/pdf_files/" + book_title + ".pdf")
+        book = get_object_or_404(Book, id=book_id)
+        if book.pdf_file:
+            book_path = book.pdf_file
+            Text = get_text_from_any_pdf(book_path)
+        else:
+            return HttpResponseNotFound("The requested book does not have a PDF file.")
 
         return Response(Text, status=status.HTTP_200_OK)

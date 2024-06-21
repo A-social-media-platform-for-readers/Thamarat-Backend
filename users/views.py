@@ -51,7 +51,7 @@ class LoginView(viewsets.ModelViewSet):
 
         payload = {
             "id": user.id,
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=180),
             "iat": datetime.datetime.utcnow(),
         }
 

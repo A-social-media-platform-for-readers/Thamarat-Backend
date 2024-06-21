@@ -91,7 +91,7 @@ urlpatterns = [
     path("users/search/<str:string>/", UserSearch.as_view({"get": "list"})),
     # AI end points
     path(
-        "AI/OCR/<str:book_title>/<str:language>/<int:pages_count>/",
+        "AI/OCR/<int:book_id>/<int:start_page>/<int:end_page>/<str:language>/",
         OCR.as_view({"post": "pdf2text"}),
     ),
     path(
