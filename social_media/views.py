@@ -1,5 +1,10 @@
 from rest_framework.response import Response
-from .serializers import PostSerializer, CommentSerializer, InnerCommentSerializer
+from .serializers import (
+    PostSerializerCreate,
+    PostSerializer,
+    CommentSerializer,
+    InnerCommentSerializer,
+)
 from .models import Post, Comment, InnerComment
 from users.models import User
 from rest_framework import viewsets, pagination
@@ -21,6 +26,28 @@ class PaginationNumber(pagination.PageNumberPagination):
     page_size = 5
 
 
+class PostCreate(viewsets.ModelViewSet):
+    """
+    API endpoint that allows posts to be viewed or edited.
+    """
+
+    queryset = Post.objects.all()
+    serializer_class = PostSerializerCreate
+    pagination_class = PaginationNumber
+
+    def create(self, request):
+        """
+        Create a new post.
+        """
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        request.data["user"] = user_id
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
 class PostViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows posts to be viewed or edited.
@@ -34,8 +61,17 @@ class PostViewSet(viewsets.ModelViewSet):
         """
         List posts by pagination pages(5 by 5).
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        user = User.objects.filter(id=user_id).first()
         queryset = self.get_queryset()
+        for post in queryset:
+            if user in post.liked_users.all():
+                post.you_liked = True
+                post.save()
+            else:
+                post.you_liked = False
+                post.save()
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -44,23 +80,21 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    def create(self, request):
-        """
-        Create a new post.
-        """
-        UserView.check_auth(self, request)
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
     def retrieve(self, request, pk):
         """
         Retrieve a post.
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        user = User.objects.filter(id=user_id).first()
         try:
             queryset = self.get_queryset().filter(id=pk).first()
+            if user in queryset.liked_users.all():
+                queryset.you_liked = True
+                queryset.save()
+            else:
+                queryset.you_liked = False
+                queryset.save()
             serializer = self.serializer_class(queryset)
             return Response(serializer.data)
         except:
@@ -118,8 +152,11 @@ class PostLikeViewSet(viewsets.ModelViewSet):
 
         Note: request body is not required.
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        user = User.objects.filter(id=user_id).first()
         post = self.get_queryset().filter(id=pk).first()
+        post.liked_users.add(user)
         post.like()
         return Response("Post Liked", status=status.HTTP_201_CREATED)
 
@@ -127,8 +164,11 @@ class PostLikeViewSet(viewsets.ModelViewSet):
         """
         Unlike a Post(subtract one form likes count).
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        user = User.objects.filter(id=user_id).first()
         post = self.get_queryset().filter(id=pk).first()
+        post.liked_users.remove(user)
         post.remove_like()
         return Response("Post Unliked", status=status.HTTP_201_CREATED)
 

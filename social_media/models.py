@@ -14,6 +14,8 @@ class Post(models.Model):
     video = models.FileField(upload_to="media/posts/videos/", blank=True)
     creat_time = models.DateTimeField(auto_now_add=True)
     like_count = models.PositiveIntegerField(default=0)
+    liked_users = models.ManyToManyField(User, related_name="liked_posts", blank=True)
+    you_liked = models.BooleanField(default=False)
     comment_count = models.PositiveIntegerField(default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
 

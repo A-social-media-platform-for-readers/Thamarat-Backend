@@ -195,9 +195,10 @@ urlpatterns = [
     ),
     # social media end points
     # Post end points
+    path("social-media/posts/create/", PostCreate.as_view({"post": "create"})),
     path(
         "social-media/posts/",
-        PostViewSet.as_view({"get": "list", "post": "create"}),
+        PostViewSet.as_view({"get": "list"}),
     ),
     path(
         "social-media/posts/<int:pk>/",
