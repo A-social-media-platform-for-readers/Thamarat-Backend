@@ -77,9 +77,12 @@ class Comment(models.Model):
     Post 's Comments Model.
     """
 
+    id = models.AutoField(primary_key=True)
     content = models.TextField(max_length=1024)
-    created_time = models.DateTimeField(auto_now_add=True)
+    creat_time = models.DateTimeField(auto_now_add=True)
     like_count = models.PositiveIntegerField(default=0)
+    liked_users = models.ManyToManyField(User, related_name="liked_comments", blank=True)
+    you_liked = models.BooleanField(default=False)
     inner_comment_count = models.PositiveIntegerField(default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
@@ -89,7 +92,7 @@ class Comment(models.Model):
         Default ordering by latest posts first.
         """
 
-        ordering = ["-created_time"]
+        ordering = ["-creat_time"]
 
     def __str__(self):
         """
@@ -134,9 +137,12 @@ class InnerComment(models.Model):
     Comment 's Inner Comments Model.
     """
 
+    id = models.AutoField(primary_key=True)
     content = models.TextField(max_length=1024)
-    created_time = models.DateTimeField(auto_now_add=True)
+    creat_time = models.DateTimeField(auto_now_add=True)
     like_count = models.PositiveIntegerField(default=0)
+    liked_users = models.ManyToManyField(User, related_name="liked_inner_comments", blank=True)
+    you_liked = models.BooleanField(default=False)
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="inner_comments"
     )
@@ -149,7 +155,7 @@ class InnerComment(models.Model):
         Default ordering by latest posts first.
         """
 
-        ordering = ["-created_time"]
+        ordering = ["-creat_time"]
 
     def __str__(self):
         """

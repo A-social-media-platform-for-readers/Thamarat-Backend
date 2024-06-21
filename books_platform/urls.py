@@ -210,8 +210,12 @@ urlpatterns = [
     ),
     # Comment end points
     path(
+        "social-media/posts/comments/create/",
+        CommentCreate.as_view({"post": "create"}),
+    ),
+    path(
         "social-media/posts/comments/<int:post_id>/",
-        CommentViewSet.as_view({"get": "list", "post": "create"}),
+        CommentViewSet.as_view({"get": "list"}),
     ),
     path(
         "social-media/posts/comment/<int:comment_id>/",
@@ -225,8 +229,12 @@ urlpatterns = [
     ),
     # InnerComment end points
     path(
+        "social-media/posts/comments/inner-comments/create/",
+        InnerCommentCreate.as_view({"post": "create"}),
+    ),
+    path(
         "social-media/posts/comments/inner-comments/<int:comment_id>/",
-        InnerCommentViewSet.as_view({"get": "list", "post": "create"}),
+        InnerCommentViewSet.as_view({"get": "list"}),
     ),
     path(
         "social-media/posts/comments/inner-comment/<int:inner_comment_id>/",

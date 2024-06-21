@@ -2,7 +2,9 @@ from rest_framework.response import Response
 from .serializers import (
     PostSerializerCreate,
     PostSerializer,
+    CommentSerializerCreate,
     CommentSerializer,
+    InnerCommentSerializerCreate,
     InnerCommentSerializer,
 )
 from .models import Post, Comment, InnerComment
@@ -173,6 +175,30 @@ class PostLikeViewSet(viewsets.ModelViewSet):
         return Response("Post Unliked", status=status.HTTP_201_CREATED)
 
 
+class CommentCreate(viewsets.ModelViewSet):
+    """
+    API endpoint that allows comments to be viewed or edited.
+    """
+
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializerCreate
+    pagination_class = PaginationNumber
+
+    def create(self, request):
+        """
+        Create a new comment.
+        """
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        request.data["user"] = user_id
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        post = Post.objects.filter(id=request.data["post"]).first()
+        post.add_comment()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
 class CommentViewSet(viewsets.ModelViewSet):
     """
     Comment viewset.
@@ -186,9 +212,18 @@ class CommentViewSet(viewsets.ModelViewSet):
         """
         List comments by pagination pages(5 by 5).
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        user = User.objects.filter(id=user_id).first()
         post = Post.objects.filter(id=post_id).first()
         queryset = self.get_queryset().filter(post=post)
+        for comment in queryset:
+            if user in comment.liked_users.all():
+                comment.you_liked = True
+                comment.save()
+            else:
+                comment.you_liked = False
+                comment.save()
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -197,25 +232,21 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    def create(self, request, post_id):
-        """
-        Create a new comment.
-        """
-        UserView.check_auth(self, request)
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        post = Post.objects.filter(id=post_id).first()
-        post.add_comment()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
     def retrieve(self, request, comment_id):
         """
         Retrieve a comment.
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        user = User.objects.filter(id=user_id).first()
         try:
             queryset = self.get_queryset().filter(id=comment_id).first()
+            if user in queryset.liked_users.all():
+                queryset.you_liked = True
+                queryset.save()
+            else:
+                queryset.you_liked = False
+                queryset.save()
             serializer = self.serializer_class(queryset)
             return Response(serializer.data)
         except:
@@ -274,8 +305,11 @@ class CommentLikeViewSet(viewsets.ModelViewSet):
 
         Note: request body is not required.
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        user = User.objects.filter(id=user_id).first()
         comment = self.get_queryset().filter(id=comment_id).first()
+        comment.liked_users.add(user)
         comment.like()
         return Response("Comment Liked", status=status.HTTP_201_CREATED)
 
@@ -283,10 +317,37 @@ class CommentLikeViewSet(viewsets.ModelViewSet):
         """
         Unlike a Comment(subtract one form likes count).
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        user = User.objects.filter(id=user_id).first()
         comment = self.get_queryset().filter(id=comment_id).first()
+        comment.liked_users.remove(user)
         comment.remove_like()
         return Response("Comment Unliked", status=status.HTTP_201_CREATED)
+
+
+class InnerCommentCreate(viewsets.ModelViewSet):
+    """
+    API endpoint that allows InnerComments to be viewed or edited.
+    """
+
+    queryset = InnerComment.objects.all()
+    serializer_class = InnerCommentSerializerCreate
+    pagination_class = PaginationNumber
+
+    def create(self, request):
+        """
+        Create a new InnerComment.
+        """
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        request.data["user"] = user_id
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        comment = Comment.objects.filter(id=request.data["comment"]).first()
+        comment.add_inner_comment()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class InnerCommentViewSet(viewsets.ModelViewSet):
@@ -300,11 +361,20 @@ class InnerCommentViewSet(viewsets.ModelViewSet):
 
     def list(self, request, comment_id):
         """
-        List Inner Comments by pagination pages(5 by 5).
+        List InnerComments by pagination pages(5 by 5).
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        user = User.objects.filter(id=user_id).first()
         comment = Comment.objects.filter(id=comment_id).first()
         queryset = self.get_queryset().filter(comment=comment)
+        for inner_comment in queryset:
+            if user in inner_comment.liked_users.all():
+                inner_comment.you_liked = True
+                inner_comment.save()
+            else:
+                inner_comment.you_liked = False
+                inner_comment.save()
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -313,25 +383,21 @@ class InnerCommentViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    def create(self, request, comment_id):
-        """
-        Create a new InnerComment.
-        """
-        UserView.check_auth(self, request)
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        comment = Comment.objects.filter(id=comment_id).first()
-        comment.add_inner_comment()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
     def retrieve(self, request, inner_comment_id):
         """
         Retrieve a InnerComment.
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        user = User.objects.filter(id=user_id).first()
         try:
             queryset = self.get_queryset().filter(id=inner_comment_id).first()
+            if user in queryset.liked_users.all():
+                queryset.you_liked = True
+                queryset.save()
+            else:
+                queryset.you_liked = False
+                queryset.save()
             serializer = self.serializer_class(queryset)
             return Response(serializer.data)
         except:
@@ -394,8 +460,11 @@ class InnerCommentLikeViewSet(viewsets.ModelViewSet):
 
         Note: request body is not required.
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        user = User.objects.filter(id=user_id).first()
         inner_comment = self.get_queryset().filter(id=inner_comment_id).first()
+        inner_comment.liked_users.add(user)
         inner_comment.like()
         return Response("InnerComment Liked", status=status.HTTP_201_CREATED)
 
@@ -403,7 +472,10 @@ class InnerCommentLikeViewSet(viewsets.ModelViewSet):
         """
         Unlike a InnerComment(subtract one form likes count).
         """
-        UserView.check_auth(self, request)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        user = User.objects.filter(id=user_id).first()
         inner_comment = self.get_queryset().filter(id=inner_comment_id).first()
+        inner_comment.liked_users.remove(user)
         inner_comment.remove_like()
         return Response("InnerComment Unliked", status=status.HTTP_201_CREATED)

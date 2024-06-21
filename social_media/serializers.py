@@ -50,8 +50,32 @@ class PostSerializer(serializers.ModelSerializer):
         ]
         extra_kwargs = {
             "like_count": {"read_only": True},
-            "comment_count": {"read_only": True},
             "you_liked": {"read_only": True},
+            "comment_count": {"read_only": True},
+        }
+
+
+class CommentSerializerCreate(serializers.ModelSerializer):
+    """
+    Post Serializer.
+    """
+
+    class Meta:
+        model = Comment
+        fields = [
+            "id",
+            "content",
+            "creat_time",
+            "like_count",
+            "you_liked",
+            "inner_comment_count",
+            "user",
+            "post",
+        ]
+        extra_kwargs = {
+            "like_count": {"read_only": True},
+            "you_liked": {"read_only": True},
+            "inner_comment_count": {"read_only": True},
         }
 
 
@@ -60,12 +84,46 @@ class CommentSerializer(serializers.ModelSerializer):
     Comment Serializer.
     """
 
+    user = UserSerializer(read_only=True)
+
     class Meta:
         model = Comment
-        fields = "__all__"
+        fields = [
+            "id",
+            "content",
+            "creat_time",
+            "like_count",
+            "you_liked",
+            "inner_comment_count",
+            "user",
+            "post",
+        ]
         extra_kwargs = {
             "like_count": {"read_only": True},
+            "you_liked": {"read_only": True},
             "inner_comment_count": {"read_only": True},
+        }
+
+
+class InnerCommentSerializerCreate(serializers.ModelSerializer):
+    """
+    Post Serializer.
+    """
+
+    class Meta:
+        model = InnerComment
+        fields = [
+            "id",
+            "content",
+            "creat_time",
+            "like_count",
+            "you_liked",
+            "user",
+            "comment",
+        ]
+        extra_kwargs = {
+            "like_count": {"read_only": True},
+            "you_liked": {"read_only": True},
         }
 
 
@@ -74,7 +132,20 @@ class InnerCommentSerializer(serializers.ModelSerializer):
     InnerComment Serializer.
     """
 
+    user = UserSerializer(read_only=True)
+
     class Meta:
         model = InnerComment
-        fields = "__all__"
-        extra_kwargs = {"like_count": {"read_only": True}}
+        fields = [
+            "id",
+            "content",
+            "creat_time",
+            "like_count",
+            "you_liked",
+            "user",
+            "comment",
+        ]
+        extra_kwargs = {
+            "like_count": {"read_only": True},
+            "you_liked": {"read_only": True},
+        }
