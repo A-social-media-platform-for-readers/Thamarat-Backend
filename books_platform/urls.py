@@ -100,6 +100,7 @@ urlpatterns = [
     ),
     # book end points
     # path("", include(BookRouter.urls)),
+    path("books/user-list/<int:user_id>/", BookUserList.as_view({"get": "list"})),
     path("books/6", BookViewSet6.as_view({"get": "list"})),
     path("books/", BookViewSet.as_view({"get": "list", "post": "create"})),
     path(
@@ -195,17 +196,21 @@ urlpatterns = [
     ),
     # social media end points
     # Post end points
+    path(
+        "social-media/posts/user-list/<int:user_id>/",
+        PostUserList.as_view({"get": "list"}),
+    ),
     path("social-media/posts/create/", PostCreate.as_view({"post": "create"})),
     path(
         "social-media/posts/",
         PostViewSet.as_view({"get": "list"}),
     ),
     path(
-        "social-media/posts/<int:pk>/",
+        "social-media/posts/<int:post_id>/",
         PostViewSet.as_view({"get": "retrieve", "put": "update", "delete": "destroy"}),
     ),
     path(
-        "social-media/posts/<int:pk>/likes/",
+        "social-media/posts/<int:post_id>/likes/",
         PostLikeViewSet.as_view({"post": "like", "delete": "unlike"}),
     ),
     # Comment end points

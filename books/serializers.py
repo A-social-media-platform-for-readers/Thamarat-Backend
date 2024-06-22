@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Book, BookSummary, BookReview, BookReaders, BookToRead, BookReading
 from users.serializers import UserSerializer
+from users.models import User
 
 
 class BookSerializer(serializers.ModelSerializer):
@@ -34,6 +35,18 @@ class BookSerializer(serializers.ModelSerializer):
             "reading_count": {"read_only": True},
             "to_read_count": {"read_only": True},
         }
+
+
+class BookUserSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Book model
+    """
+
+    our_books = BookSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = User
+        fields = ["our_books"]
 
 
 class BookSummarySerializer(serializers.ModelSerializer):

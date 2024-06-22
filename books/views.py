@@ -7,6 +7,7 @@ from users.models import User
 from users.views import UserView
 from .serializers import (
     BookSerializer,
+    BookUserSerializer,
     BookSummarySerializer,
     BookReadersSerializer,
     BookToReadSerializer,
@@ -164,6 +165,24 @@ class BookViewSet(viewsets.ModelViewSet):
             return Response("Book Deleted")
         except:
             return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)
+
+
+class BookUserList(viewsets.ModelViewSet):
+    """
+    List all user 's books.
+    """
+
+    serializer_class = BookUserSerializer
+    queryset = User.objects.all()
+
+    def list(self, request, user_id):
+        """
+        List all user 's books.
+        """
+        UserView.check_auth(self, request)
+        queryset = self.get_queryset().filter(id=user_id)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class BookDownload(viewsets.ModelViewSet):
