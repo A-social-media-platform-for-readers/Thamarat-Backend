@@ -147,11 +147,23 @@ urlpatterns = [
         WantToRead.as_view({"get": "get_to_read_books"}),
     ),
     path(
+        "books/delete-readed/<int:book_id>/",
+        WantToRead.as_view({"delete": "delete_readed_book"}),
+    ),
+    path(
+        "books/delete-reading/<int:book_id>/",
+        WantToRead.as_view({"delete": "delete_reading_book"}),
+    ),
+    path(
+        "books/delete-to-read/<int:book_id>/",
+        WantToRead.as_view({"delete": "delete_to_read_book"}),
+    ),
+    path(
         "books/reviews/<int:book_id>/",
         BookReviewView.as_view({"get": "list", "post": "create"}),
     ),
     path(
-        "books/review/<int:Review_id>/",
+        "books/review/<int:Review_id>/<int:book_id>/",
         BookReviewView.as_view(
             {"get": "retrieve", "put": "update", "delete": "destroy"}
         ),

@@ -344,6 +344,51 @@ class WantToRead(viewsets.ModelViewSet):
             books.append(book.data[0])
         return Response(books)
 
+    def delete_readed_book(self, request, book_id):
+        """
+        Delete book from readed books.
+        """
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        try:
+            book = self.get_queryset().filter(id=book_id).first()
+        except:
+            return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)
+        book_reader = BookReaders.objects.filter(reader=user_id, book=book_id)
+        book_reader.delete()
+        book.remove_reader()
+        return Response("Book Removed From Readed Books")
+
+    def delete_reading_book(self, request, book_id):
+        """
+        Delete book from reading books.
+        """
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        try:
+            book = self.get_queryset().filter(id=book_id).first()
+        except:
+            return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)
+        book_reading = BookReading.objects.filter(reader=user_id, book=book_id)
+        book_reading.delete()
+        book.remove_reading()
+        return Response("Book Removed From reading Books")
+
+    def delete_to_read_book(self, request, book_id):
+        """
+        Delete book from want to read books.
+        """
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        try:
+            book = self.get_queryset().filter(id=book_id).first()
+        except:
+            return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)
+        book_to_read = BookToRead.objects.filter(reader=user_id, book=book_id)
+        book_to_read.delete()
+        book.remove_to_read()
+        return Response("Book Removed From To Read Books")
+
 
 class BookReviewView(viewsets.ModelViewSet):
     """
@@ -398,13 +443,15 @@ class BookReviewView(viewsets.ModelViewSet):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def destroy(self, request, Review_id):
+    def destroy(self, request, Review_id, book_id):
         """
         Delete book review.
         """
         UserView.check_auth(self, request)
         try:
             queryset = self.get_queryset().filter(id=Review_id).first()
+            book = Book.objects.get(id=book_id)
+            book.remove_reviwe()
             queryset.delete()
             return Response("Review Deleted")
         except:

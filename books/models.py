@@ -55,11 +55,25 @@ class Book(models.Model):
         self.reviwes_count += 1
         self.save()
 
+    def remove_reviwe(self):
+        """
+        Remove one to the number of reviwes.
+        """
+        self.reviwes_count -= 1
+        self.save()
+
     def add_reader(self):
         """
         Add one to the number of readers.
         """
         self.readers_count += 1
+        self.save()
+
+    def remove_reader(self):
+        """
+        Remove one to the number of readers.
+        """
+        self.readers_count -= 1
         self.save()
 
     def add_reading(self):
@@ -69,11 +83,25 @@ class Book(models.Model):
         self.reading_count += 1
         self.save()
 
+    def remove_reading(self):
+        """
+        Remove one to the number of readings.
+        """
+        self.reading_count -= 1
+        self.save()
+
     def add_to_read(self):
         """
         Add one to the number of want to read.
         """
         self.to_read_count += 1
+        self.save()
+
+    def remove_to_read(self):
+        """
+        Remove one to the number of want to read.
+        """
+        self.to_read_count -= 1
         self.save()
 
 
