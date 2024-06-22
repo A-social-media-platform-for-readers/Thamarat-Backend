@@ -112,6 +112,7 @@ class BookSummary(models.Model):
 
     book = models.ForeignKey(Book, on_delete=models.CASCADE, blank=True)
     summary = models.FileField(upload_to="media/summary_files/", default=None)
+    text = models.TextField(max_length=1024, blank=True, null=True)
 
 
 class BookReview(models.Model):
