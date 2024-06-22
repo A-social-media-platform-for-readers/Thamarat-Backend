@@ -92,7 +92,7 @@ WSGI_APPLICATION = "books_platform.wsgi.application"
 # }
 DATABASES = {
     "default": dj_database_url.parse(
-        "postgres://book_database_l6gv_user:Ct9m4OB0YV4LdYy8ilbCfPYzp1eFJrad@dpg-cp5fcp21hbls73fegjpg-a.oregon-postgres.render.com/book_database_l6gv"
+        "postgresql://books_platform_m1b6_user:g5mAd9mQKlKu9bjkiOLG02unpFvSk2FB@dpg-cpr1b5rv2p9s739vmig0-a.oregon-postgres.render.com/books_platform_m1b6"
     )
 }
 
