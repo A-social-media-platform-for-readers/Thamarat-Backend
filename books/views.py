@@ -117,14 +117,14 @@ class BookViewSet(viewsets.ModelViewSet):
         """
         Create new book.
         """
-        # payload = UserView.check_auth(self, request)
-        # user_id = payload["id"]
-        # user = User.objects.get(id=user_id)
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        user = User.objects.get(id=user_id)
         book = self.serializer_class(data=request.data)
         book.is_valid(raise_exception=True)
         book.save()
-        # user.our_books.add(book.data["id"])
-        # user.save()
+        user.our_books.add(book.data["id"])
+        user.save()
         return Response(book.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk):
@@ -190,12 +190,12 @@ class BookDownload(viewsets.ModelViewSet):
 
     def download_book_pdf(self, request, book_id):
         """Download book pdf"""
-        # UserView.check_auth(self, request)
+        UserView.check_auth(self, request)
         book = get_object_or_404(Book, id=book_id)
         if book.pdf_file:
             response = FileResponse(
                 book.pdf_file.open("rb"),
-                as_attachment=False,
+                as_attachment=True,
                 filename=book.pdf_file.name,
             )
             return response
@@ -790,3 +790,21 @@ class BookSummaryUdateDelete(viewsets.ModelViewSet):
             )
         bookSummary.delete()
         return Response("Summary deleted", status=status.HTTP_204_NO_CONTENT)
+
+
+class BookSummaryDownload(viewsets.ModelViewSet):
+    """Download book summary pdf"""
+
+    def download_book_summary_pdf(self, request, book_summary_id):
+        """Download book summary pdf"""
+        UserView.check_auth(self, request)
+        book_summary = get_object_or_404(BookSummary, id=book_summary_id)
+        if book_summary.summary:
+            response = FileResponse(
+                book_summary.summary.open("rb"),
+                as_attachment=False,
+                filename=book_summary.summary.name,
+            )
+            return response
+        else:
+            return HttpResponseNotFound("The requested book summary does not have a PDF file.")

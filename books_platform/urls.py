@@ -206,6 +206,10 @@ urlpatterns = [
         "books-summary/<int:summary_id>/",
         BookSummaryUdateDelete.as_view({"put": "update", "delete": "destroy"}),
     ),
+    path(
+        "books-summary/<int:book_summary_id>/download/",
+        BookSummaryDownload.as_view({"get": "download_book_summary_pdf"}),
+    ),
     # social media end points
     # Post end points
     path(
