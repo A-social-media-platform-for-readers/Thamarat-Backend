@@ -195,7 +195,7 @@ class BookDownload(viewsets.ModelViewSet):
         if book.pdf_file:
             response = FileResponse(
                 book.pdf_file.open("rb"),
-                as_attachment=True,
+                as_attachment=False,
                 filename=book.pdf_file.name,
             )
             return response
