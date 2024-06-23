@@ -190,7 +190,7 @@ class BookDownload(viewsets.ModelViewSet):
 
     def download_book_pdf(self, request, book_id):
         """Download book pdf"""
-        UserView.check_auth(self, request)
+        # UserView.check_auth(self, request)
         book = get_object_or_404(Book, id=book_id)
         if book.pdf_file:
             response = FileResponse(
