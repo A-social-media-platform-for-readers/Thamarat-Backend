@@ -196,7 +196,7 @@ class Message(models.Model):
     creat_time = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ["-creat_time"]
+        ordering = ["creat_time"]
 
     def __str__(self):
         return self.content
