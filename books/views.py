@@ -203,6 +203,21 @@ class BookDownload(viewsets.ModelViewSet):
             return HttpResponseNotFound("The requested book does not have a PDF file.")
 
 
+class BookCoverDownload(viewsets.ModelViewSet):
+    """Download book cover"""
+
+    def download_book_cover(self, request, book_id):
+        """Download book cover"""
+        UserView.check_auth(self, request)
+        book = get_object_or_404(Book, id=book_id)
+        if book.cover_image:
+            return Response(book.cover_image.url)
+        else:
+            return HttpResponseNotFound(
+                "The requested book does not have a cover image."
+            )
+
+
 class BookRate(viewsets.ModelViewSet):
     """
     Book rate view.
@@ -807,4 +822,6 @@ class BookSummaryDownload(viewsets.ModelViewSet):
             )
             return response
         else:
-            return HttpResponseNotFound("The requested book summary does not have a PDF file.")
+            return HttpResponseNotFound(
+                "The requested book summary does not have a PDF file."
+            )

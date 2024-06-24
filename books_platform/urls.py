@@ -119,6 +119,10 @@ urlpatterns = [
         BookDownload.as_view({"get": "download_book_pdf"}),
     ),
     path(
+        "books/<int:book_id>/cover-image/download/",
+        BookCoverDownload.as_view({"get": "download_book_cover"}),
+    ),
+    path(
         "books/rate/<int:book_id>/<float&integer:rating>/",
         BookRate.as_view({"post": "rate"}),
     ),
