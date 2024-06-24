@@ -81,7 +81,9 @@ class Comment(models.Model):
     content = models.TextField(max_length=1024)
     creat_time = models.DateTimeField(auto_now_add=True)
     like_count = models.PositiveIntegerField(default=0)
-    liked_users = models.ManyToManyField(User, related_name="liked_comments", blank=True)
+    liked_users = models.ManyToManyField(
+        User, related_name="liked_comments", blank=True
+    )
     you_liked = models.BooleanField(default=False)
     inner_comment_count = models.PositiveIntegerField(default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
@@ -141,7 +143,9 @@ class InnerComment(models.Model):
     content = models.TextField(max_length=1024)
     creat_time = models.DateTimeField(auto_now_add=True)
     like_count = models.PositiveIntegerField(default=0)
-    liked_users = models.ManyToManyField(User, related_name="liked_inner_comments", blank=True)
+    liked_users = models.ManyToManyField(
+        User, related_name="liked_inner_comments", blank=True
+    )
     you_liked = models.BooleanField(default=False)
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="inner_comments"
@@ -178,3 +182,21 @@ class InnerComment(models.Model):
         if self.like_count > 0:
             self.like_count -= 1
             self.save()
+
+
+class Message(models.Model):
+    """Message Model."""
+
+    id = models.AutoField(primary_key=True)
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sender")
+    receiver = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="receiver"
+    )
+    content = models.TextField(max_length=1024)
+    creat_time = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-creat_time"]
+
+    def __str__(self):
+        return self.content

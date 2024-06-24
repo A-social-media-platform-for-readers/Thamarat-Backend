@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post, Comment, InnerComment
+from .models import Post, Comment, InnerComment, Message
 from users.serializers import UserSerializer
 
 
@@ -149,3 +149,26 @@ class InnerCommentSerializer(serializers.ModelSerializer):
             "like_count": {"read_only": True},
             "you_liked": {"read_only": True},
         }
+
+
+class MessageSerializerCreate(serializers.ModelSerializer):
+    """
+    Message Serializer.
+    """
+
+    class Meta:
+        model = Message
+        fields = ["id", "sender", "receiver", "content"]
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    """
+    Message Serializer.
+    """
+
+    sender = UserSerializer(read_only=True)
+    receiver = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Message
+        fields = ["id", "sender", "receiver", "content", "creat_time"]

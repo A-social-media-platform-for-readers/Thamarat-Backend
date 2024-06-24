@@ -6,8 +6,10 @@ from .serializers import (
     CommentSerializer,
     InnerCommentSerializerCreate,
     InnerCommentSerializer,
+    MessageSerializerCreate,
+    MessageSerializer,
 )
-from .models import Post, Comment, InnerComment
+from .models import Post, Comment, InnerComment, Message
 from users.models import User
 from rest_framework import viewsets, pagination
 from rest_framework import status
@@ -511,3 +513,92 @@ class InnerCommentLikeViewSet(viewsets.ModelViewSet):
         inner_comment.liked_users.remove(user)
         inner_comment.remove_like()
         return Response("InnerComment Unliked", status=status.HTTP_201_CREATED)
+
+
+class MessageCreate(viewsets.ModelViewSet):
+    """
+    Create Message.
+    """
+
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializerCreate
+
+    def create(self, request):
+        """
+        Create a new Message.
+        """
+        UserView.check_auth(self, request)
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class MessageViewSet(viewsets.ModelViewSet):
+    """
+    Message Viewset.
+    """
+
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+
+    def list(self, request):
+        """
+        List Messages.
+        """
+        UserView.check_auth(self, request)
+        queryset = self.get_queryset()
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, message_id):
+        """
+        Retrieve a Message.
+        """
+        UserView.check_auth(self, request)
+        try:
+            message = self.get_queryset().filter(id=message_id).first()
+            serializer = self.serializer_class(message)
+            return Response(serializer.data)
+        except:
+            return Response("Message Not Found", status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request, message_id):
+        """
+        Update a Message.
+        """
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        try:
+            message = self.get_queryset().filter(id=message_id).first()
+            if message is not None:
+                if user_id != message.sender.id:
+                    return Response(
+                        "You are not authorized to update this Message",
+                        status=status.HTTP_403_FORBIDDEN,
+                    )
+            serializer = self.serializer_class(message, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except:
+            return Response("Message Not Found", status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, message_id):
+        """
+        Delete a Message.
+        """
+        payload = UserView.check_auth(self, request)
+        user_id = payload["id"]
+        try:
+            message = self.get_queryset().filter(id=message_id).first()
+            if message is not None:
+                if user_id != message.sender.id:
+                    return Response(
+                        "You are not authorized to delete this Message",
+                        status=status.HTTP_403_FORBIDDEN,
+                    )
+            message.delete()
+            return Response("Message Deleted")
+        except:
+            return Response("Message Not Found", status=status.HTTP_400_BAD_REQUEST)

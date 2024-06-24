@@ -267,6 +267,15 @@ urlpatterns = [
         "social-media/posts/comments/inner-comments/<int:inner_comment_id>/likes/",
         InnerCommentLikeViewSet.as_view({"post": "like", "delete": "unlike"}),
     ),
+    # Chat end points
+    path("chat/create/", MessageCreate.as_view({"post": "create"})),
+    path("chat/", MessageViewSet.as_view({"get": "list"})),
+    path(
+        "chat/<int:message_id>/",
+        MessageViewSet.as_view(
+            {"get": "retrieve", "put": "update", "delete": "destroy"}
+        ),
+    ),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
