@@ -211,7 +211,12 @@ class BookCoverDownload(viewsets.ModelViewSet):
         UserView.check_auth(self, request)
         book = get_object_or_404(Book, id=book_id)
         if book.cover_image:
-            return Response(book.cover_image.url)
+            response = FileResponse(
+                book.cover_image.open("rb"),
+                as_attachment=True,
+                filename=book.cover_image.name,
+            )
+            return response
         else:
             return HttpResponseNotFound(
                 "The requested book does not have a cover image."
