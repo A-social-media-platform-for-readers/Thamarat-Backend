@@ -20,6 +20,6 @@ This project provides the backend API for a social media platform specifically d
 -sudo apt install tesseract-ocr-ara  
 ## Running the Application
 ### Start the Development Server:
--python3 manage.py runserver  
+`python3 manage.py runserver`  
 ### SWAGGER Interactive API Documentation:
 -https://backend-9s26.onrender.com/api/schema/swagger-ui/  
