@@ -113,7 +113,7 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         List Users.
         """
-        
+
         user = self.get_queryset()
         serializer = self.serializer_class(user, many=True)
         return Response(serializer.data)
@@ -122,7 +122,7 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Retrieve user by id.
         """
-        
+
         user = self.get_queryset().filter(id=pk).first()
         serializer = self.serializer_class(user)
         return Response(serializer.data)
@@ -200,7 +200,7 @@ class FollowView(viewsets.ModelViewSet):
         """
         Get My Followers.
         """
-        
+
         user = self.get_queryset().filter(id=user_id).first()
         follower = user.followers
         serializer = self.serializer_class(follower, many=True)
@@ -210,7 +210,7 @@ class FollowView(viewsets.ModelViewSet):
         """
         Get Users Who I Follow.
         """
-        
+
         user = self.get_queryset().filter(id=user_id).first()
         follower = user.following
         serializer = self.serializer_class(follower, many=True)
@@ -247,7 +247,6 @@ class UserSearch(viewsets.ModelViewSet):
         Note: the input string search can be near from the actual string.
         """
 
-        
         queryset = (
             self.get_queryset().filter(name__icontains=string)
             | self.get_queryset().filter(name__trigram_similar=string)

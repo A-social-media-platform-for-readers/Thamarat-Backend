@@ -63,7 +63,7 @@ class PostUserList(viewsets.ModelViewSet):
         """
         List posts by pagination pages(5 by 5).
         """
-        
+
         user = User.objects.filter(id=user_id).first()
         queryset = self.get_queryset().filter(user=user)
         for post in queryset:
@@ -486,7 +486,7 @@ class MessageCreate(viewsets.ModelViewSet):
         """
         Create a new Message.
         """
-        
+
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -505,7 +505,7 @@ class MessageViewSet(viewsets.ModelViewSet):
         """
         List Messages.
         """
-        
+
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
@@ -514,7 +514,7 @@ class MessageViewSet(viewsets.ModelViewSet):
         """
         Retrieve a Message.
         """
-        
+
         try:
             message = self.get_queryset().filter(id=message_id).first()
             serializer = self.serializer_class(message)

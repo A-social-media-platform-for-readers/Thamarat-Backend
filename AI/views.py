@@ -26,7 +26,6 @@ class Translate(viewsets.ModelViewSet):
         Return:
             translated text.
         """
-        
         translated = GoogleTranslator(source='auto', target=language).translate(text)
         
         return Response(translated, status=status.HTTP_200_OK)
@@ -51,7 +50,6 @@ class OCR(viewsets.ModelViewSet):
 			the textual content of all the pages.
 		"""
 
-        
         def convert_pdf_to_img(pdf_file):
             """
             this function converts a PDF into Image
