@@ -72,29 +72,11 @@ class UserView(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    def check_auth(self, request):
-        """
-        Check Authentication function is used for view apis by
-        import it in views.py to secure our apis.
-        """
-        token = request.headers.get("Authorization") or request.COOKIES.get("jwt")
-
-        if not token:
-            raise AuthenticationFailed("Unauthenticated!")
-
-        try:
-            payload = jwt.decode(token, "secret", algorithms=["HS256"])
-        except jwt.ExpiredSignatureError:
-            raise AuthenticationFailed("Unauthenticated!")
-
-        return payload
-
     def retrieve(self, request):
         """
         Retrieve Login User data after checking authentication.
         """
-        payload = self.check_auth(request)
-        user = self.get_queryset().filter(id=payload["id"]).first()
+        user = request.user
         serializer = self.serializer_class(user)
         return Response(serializer.data)
 
@@ -131,7 +113,7 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         List Users.
         """
-        UserView.check_auth(self, request)
+        
         user = self.get_queryset()
         serializer = self.serializer_class(user, many=True)
         return Response(serializer.data)
@@ -140,7 +122,7 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Retrieve user by id.
         """
-        UserView.check_auth(self, request)
+        
         user = self.get_queryset().filter(id=pk).first()
         serializer = self.serializer_class(user)
         return Response(serializer.data)
@@ -149,11 +131,9 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Update User.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
         user = self.get_queryset().filter(id=pk).first()
         if user is not None:
-            if user_id != user.id:
+            if request.user.id != user.id:
                 return Response(
                     "You are not authorized to update this data",
                     status=status.HTTP_403_FORBIDDEN,
@@ -167,11 +147,9 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Delete User.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
         user = self.get_queryset().filter(id=pk).first()
         if user is not None:
-            if user_id != user.id:
+            if request.user.id != user.id:
                 return Response(
                     "You are not authorized to delete this user",
                     status=status.HTTP_403_FORBIDDEN,
@@ -194,8 +172,7 @@ class FollowView(viewsets.ModelViewSet):
 
         Note: request body is not required.
         """
-        payload = UserView.check_auth(self, request)
-        user_to_follow_id = payload["id"]
+        user_to_follow_id = request.user.id
         user_to_follow = self.get_queryset().filter(id=user_to_follow_id).first()
         user_to_followed = self.get_queryset().filter(id=user_to_followed_id).first()
         user_to_follow.following.add(user_to_followed)
@@ -208,8 +185,7 @@ class FollowView(viewsets.ModelViewSet):
         """
         Unfollow User.
         """
-        payload = UserView.check_auth(self, request)
-        user_to_unfollow_id = payload["id"]
+        user_to_unfollow_id = request.user.id
         user_to_unfollow = self.get_queryset().filter(id=user_to_unfollow_id).first()
         user_to_unfollowed = (
             self.get_queryset().filter(id=user_to_unfollowed_id).first()
@@ -224,7 +200,7 @@ class FollowView(viewsets.ModelViewSet):
         """
         Get My Followers.
         """
-        UserView.check_auth(self, request)
+        
         user = self.get_queryset().filter(id=user_id).first()
         follower = user.followers
         serializer = self.serializer_class(follower, many=True)
@@ -234,7 +210,7 @@ class FollowView(viewsets.ModelViewSet):
         """
         Get Users Who I Follow.
         """
-        UserView.check_auth(self, request)
+        
         user = self.get_queryset().filter(id=user_id).first()
         follower = user.following
         serializer = self.serializer_class(follower, many=True)
@@ -271,7 +247,7 @@ class UserSearch(viewsets.ModelViewSet):
         Note: the input string search can be near from the actual string.
         """
 
-        UserView.check_auth(self, request)
+        
         queryset = (
             self.get_queryset().filter(name__icontains=string)
             | self.get_queryset().filter(name__trigram_similar=string)

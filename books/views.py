@@ -51,7 +51,7 @@ class BookViewSet6(viewsets.ModelViewSet):
         """
         List 6 books per request.
         """
-        UserView.check_auth(self, request)
+        
         queryset = self.get_queryset()
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -91,7 +91,7 @@ class BookViewSet(viewsets.ModelViewSet):
         """
         List 4 books per request.
         """
-        UserView.check_auth(self, request)
+        
         queryset = self.get_queryset()
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -105,7 +105,7 @@ class BookViewSet(viewsets.ModelViewSet):
         """
         retrieve one book by id.
         """
-        UserView.check_auth(self, request)
+        
         try:
             queryset = self.get_queryset().filter(id=pk).first()
             serializer = self.serializer_class(queryset)
@@ -117,9 +117,7 @@ class BookViewSet(viewsets.ModelViewSet):
         """
         Create new book.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        user = User.objects.get(id=user_id)
+        user = request.user
         book = self.serializer_class(data=request.data)
         book.is_valid(raise_exception=True)
         book.save()
@@ -131,7 +129,7 @@ class BookViewSet(viewsets.ModelViewSet):
         """
         Update book by id.
         """
-        UserView.check_auth(self, request)
+        
         queryset = self.get_queryset().filter(id=pk).first()
         serializer = self.serializer_class(queryset, data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -142,7 +140,7 @@ class BookViewSet(viewsets.ModelViewSet):
         """
         Partial update book by id.
         """
-        UserView.check_auth(self, request)
+        
         try:
             queryset = self.get_queryset().filter(id=pk).first()
             serializer = self.serializer_class(
@@ -158,7 +156,7 @@ class BookViewSet(viewsets.ModelViewSet):
         """
         Delete book by id.
         """
-        UserView.check_auth(self, request)
+        
         try:
             queryset = self.get_queryset().filter(id=pk).first()
             queryset.delete()
@@ -179,7 +177,7 @@ class BookUserList(viewsets.ModelViewSet):
         """
         List all user 's books.
         """
-        UserView.check_auth(self, request)
+        
         queryset = self.get_queryset().filter(id=user_id)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
@@ -190,7 +188,7 @@ class BookDownload(viewsets.ModelViewSet):
 
     def download_book_pdf(self, request, book_id):
         """Download book pdf"""
-        UserView.check_auth(self, request)
+        
         book = get_object_or_404(Book, id=book_id)
         if book.pdf_file:
             response = FileResponse(
@@ -208,7 +206,7 @@ class BookCoverDownload(viewsets.ModelViewSet):
 
     def download_book_cover(self, request, book_id):
         """Download book cover"""
-        UserView.check_auth(self, request)
+        
         book = get_object_or_404(Book, id=book_id)
         if book.cover_image:
             response = FileResponse(
@@ -239,9 +237,7 @@ class BookRate(viewsets.ModelViewSet):
             book_id (int): book id to rate it.
             rating (float): accept float or integer numbers.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        user = User.objects.filter(id=user_id).first()
+        user = request.user
         try:
             book = self.get_queryset().filter(id=book_id).first()
         except:
@@ -270,14 +266,12 @@ class WantToRead(viewsets.ModelViewSet):
 
         Note: request body is not required.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
         try:
             book = self.get_queryset().filter(id=book_id).first()
         except:
             return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)
         serializer = BookReadersSerializer(
-            data={"reader": [user_id], "book": [book.id]}
+            data={"reader": [request.user.id], "book": [book.id]}
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -290,14 +284,12 @@ class WantToRead(viewsets.ModelViewSet):
 
         Note: request body is not required.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
         try:
             book = self.get_queryset().filter(id=book_id).first()
         except:
             return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)
         serializer = BookReadingSerializer(
-            data={"reader": [user_id], "book": [book.id]}
+            data={"reader": [request.user.id], "book": [book.id]}
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -310,13 +302,11 @@ class WantToRead(viewsets.ModelViewSet):
 
         Note: request body is not required.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
         try:
             book = self.get_queryset().filter(id=book_id).first()
         except:
             return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)
-        serializer = BookToReadSerializer(data={"reader": [user_id], "book": [book.id]})
+        serializer = BookToReadSerializer(data={"reader": [request.user.id], "book": [book.id]})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         book.add_to_read()
@@ -326,9 +316,7 @@ class WantToRead(viewsets.ModelViewSet):
         """
         List my readed books.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        user = User.objects.filter(id=user_id).first()
+        user = request.user
         books_reader = BookReaders.objects.filter(reader=user)
         books = []
         for i in range(len(books_reader)):
@@ -340,9 +328,7 @@ class WantToRead(viewsets.ModelViewSet):
         """
         List my reading books.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        user = User.objects.filter(id=user_id).first()
+        user = request.user
         books_reading = BookReading.objects.filter(reader=user)
         books = []
         for i in range(len(books_reading)):
@@ -354,9 +340,7 @@ class WantToRead(viewsets.ModelViewSet):
         """
         List my want to read books.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        user = User.objects.filter(id=user_id).first()
+        user = request.user
         books_to_read = BookToRead.objects.filter(reader=user)
         books = []
         for i in range(len(books_to_read)):
@@ -368,13 +352,11 @@ class WantToRead(viewsets.ModelViewSet):
         """
         Delete book from readed books.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
         try:
             book = self.get_queryset().filter(id=book_id).first()
         except:
             return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)
-        book_reader = BookReaders.objects.filter(reader=user_id, book=book_id)
+        book_reader = BookReaders.objects.filter(reader=request.user.id, book=book_id)
         book_reader.delete()
         book.remove_reader()
         return Response("Book Removed From Readed Books")
@@ -383,13 +365,11 @@ class WantToRead(viewsets.ModelViewSet):
         """
         Delete book from reading books.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
         try:
             book = self.get_queryset().filter(id=book_id).first()
         except:
             return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)
-        book_reading = BookReading.objects.filter(reader=user_id, book=book_id)
+        book_reading = BookReading.objects.filter(reader=request.user.id, book=book_id)
         book_reading.delete()
         book.remove_reading()
         return Response("Book Removed From reading Books")
@@ -398,13 +378,11 @@ class WantToRead(viewsets.ModelViewSet):
         """
         Delete book from want to read books.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
         try:
             book = self.get_queryset().filter(id=book_id).first()
         except:
             return Response("Book Not Found", status=status.HTTP_400_BAD_REQUEST)
-        book_to_read = BookToRead.objects.filter(reader=user_id, book=book_id)
+        book_to_read = BookToRead.objects.filter(reader=request.user.id, book=book_id)
         book_to_read.delete()
         book.remove_to_read()
         return Response("Book Removed From To Read Books")
@@ -422,7 +400,7 @@ class BookReviewView(viewsets.ModelViewSet):
         """
         List book reviews.
         """
-        UserView.check_auth(self, request)
+        
         book = Book.objects.get(id=book_id)
         queryset = self.get_queryset().filter(book=book)
         serializer = self.serializer_class(queryset, many=True)
@@ -432,7 +410,7 @@ class BookReviewView(viewsets.ModelViewSet):
         """
         Create new book review.
         """
-        UserView.check_auth(self, request)
+        
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -444,7 +422,7 @@ class BookReviewView(viewsets.ModelViewSet):
         """
         Retreive book review by id.
         """
-        UserView.check_auth(self, request)
+        
         try:
             queryset = self.get_queryset().filter(id=Review_id).first()
             serializer = self.serializer_class(queryset)
@@ -456,7 +434,7 @@ class BookReviewView(viewsets.ModelViewSet):
         """
         Udate book review.
         """
-        UserView.check_auth(self, request)
+        
         queryset = self.get_queryset().filter(id=Review_id).first()
         serializer = self.serializer_class(queryset, data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -467,7 +445,7 @@ class BookReviewView(viewsets.ModelViewSet):
         """
         Delete book review.
         """
-        UserView.check_auth(self, request)
+        
         try:
             queryset = self.get_queryset().filter(id=Review_id).first()
             book = Book.objects.get(id=book_id)
@@ -492,7 +470,7 @@ class BookReviewLikes(viewsets.ModelViewSet):
 
         Note: request body is not required.
         """
-        UserView.check_auth(self, request)
+        
         review = self.get_queryset().filter(id=Review_id).first()
         review.like()
         return Response("Review Liked", status=status.HTTP_201_CREATED)
@@ -501,7 +479,7 @@ class BookReviewLikes(viewsets.ModelViewSet):
         """
         Unlike a Review(subtract one form likes count).
         """
-        UserView.check_auth(self, request)
+        
         review = self.get_queryset().filter(id=Review_id).first()
         review.remove_like()
         return Response("Review Unliked", status=status.HTTP_201_CREATED)
@@ -525,7 +503,7 @@ class BookFilterGenre(viewsets.ModelViewSet):
         Return:
             the books by pagination pages(4 by 4).
         """
-        UserView.check_auth(self, request)
+        
         try:
             queryset = self.get_queryset().filter(genre=genre)
             page = self.paginate_queryset(queryset)
@@ -565,7 +543,7 @@ class BookFilterGenreAndPrice(viewsets.ModelViewSet):
         Return:
             the books by pagination pages(4 by 4)
         """
-        UserView.check_auth(self, request)
+        
         try:
             if order_from == "DESC":
                 queryset = (
@@ -606,7 +584,7 @@ class FreeBooks(viewsets.ModelViewSet):
         """
         Retreive the free books by pagination pages(4 by 4).
         """
-        UserView.check_auth(self, request)
+        
         try:
             queryset = self.get_queryset().filter(price=0)
             page = self.paginate_queryset(queryset)
@@ -635,7 +613,7 @@ class HigherRatingBooks(viewsets.ModelViewSet):
         """
         Retreive books with higher rating by pagination pages(4 by 4).
         """
-        UserView.check_auth(self, request)
+        
         queryset = self.get_queryset().order_by("-rate")
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -660,7 +638,7 @@ class PopularBooks(viewsets.ModelViewSet):
         Retreive the popular books depend on readers_count,
         reading_count and to_read_count by pagination pages(4 by 4).
         """
-        UserView.check_auth(self, request)
+        
         queryset = self.get_queryset().order_by(
             "-readers_count", "-reading_count", "-to_read_count"
         )
@@ -698,7 +676,7 @@ class BookSearch(viewsets.ModelViewSet):
         # Implement search logic based on the query string
 
         # Implement search logic based on the string
-        UserView.check_auth(self, request)
+        
         queryset = (
             self.get_queryset().filter(title__icontains=string)
             | self.get_queryset().filter(author__icontains=string)
@@ -736,7 +714,7 @@ class BookSummaryCreate(viewsets.ModelViewSet):
 
         Note: should upload a book summary file.
         """
-        UserView.check_auth(self, request)
+        
         try:
             book = self.get_queryset().get(id=book_id)
         except Book.DoesNotExist:
@@ -761,7 +739,7 @@ class BookSummaryList(viewsets.ModelViewSet):
         """
         List book summaries.
         """
-        UserView.check_auth(self, request)
+        
         try:
             book = Book.objects.get(id=book_id)
         except Book.DoesNotExist:
@@ -785,7 +763,7 @@ class BookSummaryUdateDelete(viewsets.ModelViewSet):
         """
         Update book summary.
         """
-        UserView.check_auth(self, request)
+        
         try:
             bookSummary = self.get_queryset().filter(id=summary_id)
         except BookSummary.DoesNotExist:
@@ -801,7 +779,7 @@ class BookSummaryUdateDelete(viewsets.ModelViewSet):
         """
         Delete book summary.
         """
-        UserView.check_auth(self, request)
+        
         try:
             bookSummary = self.get_queryset().filter(id=summary_id)
         except BookSummary.DoesNotExist:
@@ -817,7 +795,7 @@ class BookSummaryDownload(viewsets.ModelViewSet):
 
     def download_book_summary_pdf(self, request, book_summary_id):
         """Download book summary pdf"""
-        UserView.check_auth(self, request)
+        
         book_summary = get_object_or_404(BookSummary, id=book_summary_id)
         if book_summary.summary:
             response = FileResponse(

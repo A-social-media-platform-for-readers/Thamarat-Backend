@@ -53,7 +53,8 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "users.middleware.AuthenticationMiddleware",
 ]
 
 ROOT_URLCONF = "books_platform.urls"
@@ -144,8 +145,8 @@ REST_FRAMEWORK = {
 
 # Spectacular settings for api auto documentation
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Your Project API",
-    "DESCRIPTION": "Your project description",
+    "TITLE": "THAMARAT API",
+    "DESCRIPTION": "This is swagger interactive API documentation for my graduation project Thamarat this is a social media platform for readers with comperhensive features like translation by AI, convert books to audio by AI, share book summaries, write reviews, participate in discussions, send messages, follow authors or publishers create posts and more.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }

@@ -43,9 +43,7 @@ class PostCreate(viewsets.ModelViewSet):
         """
         Create a new post.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        request.data["user"] = user_id
+        request.data["user"] = request.user.id
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -65,7 +63,7 @@ class PostUserList(viewsets.ModelViewSet):
         """
         List posts by pagination pages(5 by 5).
         """
-        UserView.check_auth(self, request)
+        
         user = User.objects.filter(id=user_id).first()
         queryset = self.get_queryset().filter(user=user)
         for post in queryset:
@@ -97,9 +95,7 @@ class PostViewSet(viewsets.ModelViewSet):
         """
         List posts by pagination pages(5 by 5).
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        user = User.objects.filter(id=user_id).first()
+        user = request.user
         queryset = self.get_queryset()
         for post in queryset:
             if user in post.liked_users.all():
@@ -120,9 +116,8 @@ class PostViewSet(viewsets.ModelViewSet):
         """
         Retrieve a post.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        user = User.objects.filter(id=user_id).first()
+
+        user = request.user
         try:
             queryset = self.get_queryset().filter(id=post_id).first()
             if user in queryset.liked_users.all():
@@ -140,11 +135,9 @@ class PostViewSet(viewsets.ModelViewSet):
         """
         Update a post.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
         post = self.get_queryset().filter(id=post_id).first()
         if post is not None:
-            if user_id != post.user.id:
+            if request.user.id != post.user.id:
                 return Response(
                     "You are not authorized to update this post",
                     status=status.HTTP_403_FORBIDDEN,
@@ -158,12 +151,10 @@ class PostViewSet(viewsets.ModelViewSet):
         """
         Delete a post.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
         try:
             post = self.get_queryset().filter(id=post_id).first()
             if post is not None:
-                if user_id != post.user.id:
+                if request.user.id != post.user.id:
                     return Response(
                         "You are not authorized to delete this post",
                         status=status.HTTP_403_FORBIDDEN,
@@ -188,9 +179,7 @@ class PostLikeViewSet(viewsets.ModelViewSet):
 
         Note: request body is not required.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        user = User.objects.filter(id=user_id).first()
+        user = request.user
         post = self.get_queryset().filter(id=post_id).first()
         post.liked_users.add(user)
         post.like()
@@ -200,9 +189,7 @@ class PostLikeViewSet(viewsets.ModelViewSet):
         """
         Unlike a Post(subtract one form likes count).
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        user = User.objects.filter(id=user_id).first()
+        user = request.user
         post = self.get_queryset().filter(id=post_id).first()
         post.liked_users.remove(user)
         post.remove_like()
@@ -222,9 +209,7 @@ class CommentCreate(viewsets.ModelViewSet):
         """
         Create a new comment.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        request.data["user"] = user_id
+        request.data["user"] = request.user.id
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -246,9 +231,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         """
         List comments by pagination pages(5 by 5).
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        user = User.objects.filter(id=user_id).first()
+        user = request.user
         post = Post.objects.filter(id=post_id).first()
         queryset = self.get_queryset().filter(post=post)
         for comment in queryset:
@@ -270,9 +253,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         """
         Retrieve a comment.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        user = User.objects.filter(id=user_id).first()
+        user = request.user
         try:
             queryset = self.get_queryset().filter(id=comment_id).first()
             if user in queryset.liked_users.all():
@@ -290,11 +271,9 @@ class CommentViewSet(viewsets.ModelViewSet):
         """
         Update a comment.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
         comment = self.get_queryset().filter(id=comment_id).first()
         if comment is not None:
-            if user_id != comment.user.id:
+            if request.user.id != comment.user.id:
                 return Response(
                     "You are not authorized to update this comment",
                     status=status.HTTP_403_FORBIDDEN,
@@ -308,12 +287,10 @@ class CommentViewSet(viewsets.ModelViewSet):
         """
         Delete a comment.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
         try:
             comment = self.get_queryset().filter(id=comment_id).first()
             if comment is not None:
-                if user_id != comment.user.id:
+                if request.user.id != comment.user.id:
                     return Response(
                         "You are not authorized to delete this comment",
                         status=status.HTTP_403_FORBIDDEN,
@@ -339,9 +316,7 @@ class CommentLikeViewSet(viewsets.ModelViewSet):
 
         Note: request body is not required.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        user = User.objects.filter(id=user_id).first()
+        user = request.user
         comment = self.get_queryset().filter(id=comment_id).first()
         comment.liked_users.add(user)
         comment.like()
@@ -351,9 +326,7 @@ class CommentLikeViewSet(viewsets.ModelViewSet):
         """
         Unlike a Comment(subtract one form likes count).
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        user = User.objects.filter(id=user_id).first()
+        user = request.user
         comment = self.get_queryset().filter(id=comment_id).first()
         comment.liked_users.remove(user)
         comment.remove_like()
@@ -373,9 +346,7 @@ class InnerCommentCreate(viewsets.ModelViewSet):
         """
         Create a new InnerComment.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        request.data["user"] = user_id
+        request.data["user"] = request.user.id
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -397,9 +368,7 @@ class InnerCommentViewSet(viewsets.ModelViewSet):
         """
         List InnerComments by pagination pages(5 by 5).
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        user = User.objects.filter(id=user_id).first()
+        user = request.user
         comment = Comment.objects.filter(id=comment_id).first()
         queryset = self.get_queryset().filter(comment=comment)
         for inner_comment in queryset:
@@ -421,9 +390,7 @@ class InnerCommentViewSet(viewsets.ModelViewSet):
         """
         Retrieve a InnerComment.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        user = User.objects.filter(id=user_id).first()
+        user = request.user
         try:
             queryset = self.get_queryset().filter(id=inner_comment_id).first()
             if user in queryset.liked_users.all():
@@ -443,11 +410,9 @@ class InnerCommentViewSet(viewsets.ModelViewSet):
         """
         Update a InnerComment.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
         inner_comment = self.get_queryset().filter(id=inner_comment_id).first()
         if inner_comment is not None:
-            if user_id != inner_comment.user.id:
+            if request.user.id != inner_comment.user.id:
                 return Response(
                     "You are not authorized to update this InnerComment",
                     status=status.HTTP_403_FORBIDDEN,
@@ -461,12 +426,10 @@ class InnerCommentViewSet(viewsets.ModelViewSet):
         """
         Delete a InnerComment.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
         try:
             inner_comment = self.get_queryset().filter(id=inner_comment_id).first()
             if inner_comment is not None:
-                if user_id != inner_comment.user.id:
+                if request.user.id != inner_comment.user.id:
                     return Response(
                         "You are not authorized to delete this InnerComment",
                         status=status.HTTP_403_FORBIDDEN,
@@ -494,9 +457,7 @@ class InnerCommentLikeViewSet(viewsets.ModelViewSet):
 
         Note: request body is not required.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        user = User.objects.filter(id=user_id).first()
+        user = request.user
         inner_comment = self.get_queryset().filter(id=inner_comment_id).first()
         inner_comment.liked_users.add(user)
         inner_comment.like()
@@ -506,9 +467,7 @@ class InnerCommentLikeViewSet(viewsets.ModelViewSet):
         """
         Unlike a InnerComment(subtract one form likes count).
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
-        user = User.objects.filter(id=user_id).first()
+        user = request.user
         inner_comment = self.get_queryset().filter(id=inner_comment_id).first()
         inner_comment.liked_users.remove(user)
         inner_comment.remove_like()
@@ -527,7 +486,7 @@ class MessageCreate(viewsets.ModelViewSet):
         """
         Create a new Message.
         """
-        UserView.check_auth(self, request)
+        
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -546,7 +505,7 @@ class MessageViewSet(viewsets.ModelViewSet):
         """
         List Messages.
         """
-        UserView.check_auth(self, request)
+        
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
@@ -555,7 +514,7 @@ class MessageViewSet(viewsets.ModelViewSet):
         """
         Retrieve a Message.
         """
-        UserView.check_auth(self, request)
+        
         try:
             message = self.get_queryset().filter(id=message_id).first()
             serializer = self.serializer_class(message)
@@ -567,12 +526,10 @@ class MessageViewSet(viewsets.ModelViewSet):
         """
         Update a Message.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
         try:
             message = self.get_queryset().filter(id=message_id).first()
             if message is not None:
-                if user_id != message.sender.id:
+                if request.user.id != message.sender.id:
                     return Response(
                         "You are not authorized to update this Message",
                         status=status.HTTP_403_FORBIDDEN,
@@ -588,12 +545,10 @@ class MessageViewSet(viewsets.ModelViewSet):
         """
         Delete a Message.
         """
-        payload = UserView.check_auth(self, request)
-        user_id = payload["id"]
         try:
             message = self.get_queryset().filter(id=message_id).first()
             if message is not None:
-                if user_id != message.sender.id:
+                if request.user.id != message.sender.id:
                     return Response(
                         "You are not authorized to delete this Message",
                         status=status.HTTP_403_FORBIDDEN,
