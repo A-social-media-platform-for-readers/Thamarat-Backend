@@ -146,7 +146,7 @@ REST_FRAMEWORK = {
 # Spectacular settings for api auto documentation
 SPECTACULAR_SETTINGS = {
     "TITLE": "THAMARAT API",
-    "DESCRIPTION": "This is swagger interactive API documentation for my graduation project Thamarat this is a social media platform for readers with comperhensive features like translation by AI, convert books to audio by AI, share book summaries, write reviews, participate in discussions, send messages, follow authors or publishers create posts and more.",
+    "DESCRIPTION": "This is swagger interactive API documentation for my graduation project Thamarat this project provides the backend API for a social media platform specifically designed for readers. Users can create accounts, connect with other readers, read books, translate books by AI, convert books to audio by AI, share book summaries, write reviews, participate in discussions, send messages, follow authors or publishers, and more.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
