@@ -17,11 +17,11 @@ https://drive.google.com/drive/folders/1KT2tYOcN5SGivcRazsjC5jHVLpIovYJ8?usp=sha
     python -m venv venv  
     source venv/bin/activate    
 ### Install Dependencies:
-```
-pip install -r requirements.txt    
-sudo apt install tesseract-ocr     
-sudo apt install tesseract-ocr-ara
-```
+
+    pip install -r requirements.txt    
+    sudo apt install tesseract-ocr     
+    sudo apt install tesseract-ocr-ara
+
 ## Running the Application
 ### Start the Development Server:
     python3 manage.py runserver 
