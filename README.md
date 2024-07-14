@@ -11,17 +11,17 @@ https://drive.google.com/drive/folders/1KT2tYOcN5SGivcRazsjC5jHVLpIovYJ8?usp=sha
 - Python (version 3.x recommended) - Check with python --version  
 - pip (Python package manager) - Usually included with Python installation  
 ### Clone the Repository:
-`git clone https://github.com/A-social-media-platform-for-readers/Thamarat-Backend.git`   
-`cd Thamarat-Backend`    
+    git clone https://github.com/A-social-media-platform-for-readers/Thamarat-Backend.git   
+    cd Thamarat-Backend    
 ### Create a Virtual Environment (Recommended):
-`python -m venv venv`  
-`source venv/bin/activate`    
+    python -m venv venv  
+    source venv/bin/activate    
 ### Install Dependencies:
     pip install -r requirements.txt    
     sudo apt install tesseract-ocr     
     sudo apt install tesseract-ocr-ara    
 ## Running the Application
 ### Start the Development Server:
-`python3 manage.py runserver` 
+    python3 manage.py runserver 
 ## Swagger Interactive API Documentation:
 https://backend-9s26.onrender.com/api/schema/swagger-ui/  
