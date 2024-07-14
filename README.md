@@ -22,6 +22,6 @@ https://drive.google.com/drive/folders/1KT2tYOcN5SGivcRazsjC5jHVLpIovYJ8?usp=sha
     sudo apt install tesseract-ocr-ara    
 ## Running the Application
 ### Start the Development Server:
-    `python3 manage.py runserver` 
+    python3 manage.py runserver 
 ## Swagger Interactive API Documentation:
 https://backend-9s26.onrender.com/api/schema/swagger-ui/  
